@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+import { ThemeScript } from "@/components/ui/ThemeScript";
 
 export const metadata: Metadata = {
-  title: "Todo App",
-  description: "A modern, full-stack todo application built with Next.js and Supabase",
+  title: "ToDoAPP By RecheDev | Portfolio Demo",
+  description: "Demo portfolio application built with Next.js 15 and TypeScript. Interactive demo with localStorage.",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" }
+  ],
 };
 
 export default function RootLayout({
@@ -21,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="font-sans antialiased text-xl leading-relaxed">
         <ErrorBoundary>
           <Providers>{children}</Providers>
         </ErrorBoundary>

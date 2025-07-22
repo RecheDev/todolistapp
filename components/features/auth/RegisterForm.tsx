@@ -1,135 +1,46 @@
 'use client'
 
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
 
 export function RegisterForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const { signUp } = useAuth()
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    setSuccess('')
-
-    // Validation
-    if (password !== confirmPassword) {
-      const message = 'Passwords do not match'
-      setError(message)
-      toast.error(message)
-      setLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      const message = 'Password must be at least 6 characters long'
-      setError(message)
-      toast.error(message)
-      setLoading(false)
-      return
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      const message = 'Please enter a valid email address'
-      setError(message)
-      toast.error(message)
-      setLoading(false)
-      return
-    }
-
-    try {
-      await signUp(email, password)
-      const successMessage = 'Account created successfully! Please check your email to verify your account.'
-      setSuccess(successMessage)
-      toast.success(successMessage)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Create account</CardTitle>
-        <CardDescription className="text-center">
-          Enter your details to create a new account
+    <Card className="w-full shadow-lg border-border bg-background">
+      <CardHeader className="space-y-4 p-6">
+        <CardTitle className="text-2xl md:text-3xl text-center font-bold text-foreground">Crear Cuenta</CardTitle>
+        <CardDescription className="text-center text-base md:text-lg text-muted-foreground">
+          Para este demo, usa las credenciales proporcionadas
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              autoComplete="email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              autoComplete="new-password"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={loading}
-              autoComplete="new-password"
-            />
-          </div>
-          {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-              {error}
+      <CardContent className="p-6 pt-0">
+        <div className="space-y-4">
+          <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-md border border-amber-200 dark:border-amber-700">
+            <h3 className="font-medium text-amber-900 dark:text-amber-100 mb-2">
+              🚀 Demo de Portfolio
+            </h3>
+            <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+              Esta es una aplicación demo para portfolio. No es necesario crear una cuenta real.
+            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+              <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">Credenciales Demo:</p>
+              <p className="text-blue-700 dark:text-blue-300">📧 demo@todoapp.com</p>
+              <p className="text-blue-700 dark:text-blue-300">🔑 demo123</p>
             </div>
-          )}
-          {success && (
-            <div className="text-sm text-green-600 bg-green-50 p-3 rounded-md">
-              {success}
-            </div>
-          )}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create account'}
+          </div>
+          
+          <Button asChild className="w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+            <Link href="/login">
+              🔐 Ir al Login con Credenciales Demo
+            </Link>
           </Button>
-        </form>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{' '}
-          <Link href="/login" className="text-primary hover:underline">
-            Sign in
+        </div>
+        
+        <div className="mt-6 text-center text-sm">
+          ¿Ya tienes las credenciales?{' '}
+          <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+            Iniciar sesión
           </Link>
         </div>
       </CardContent>

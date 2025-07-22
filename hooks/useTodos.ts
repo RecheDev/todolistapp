@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from './useAuth'
-import { getTodos, createTodo, updateTodo, deleteTodo, toggleTodo } from '@/lib/api'
+import { getTodos, createTodo, updateTodo, deleteTodo, toggleTodo, createShoppingList, updateShoppingItem } from '@/lib/api'
 import { Todo } from '@/types/database'
 import { toast } from 'sonner'
 
@@ -19,7 +19,7 @@ export function useTodos() {
       createTodo(user!.id, title, description),
     onSuccess: (newTodo) => {
       queryClient.invalidateQueries({ queryKey: ['todos', user?.id] })
-      toast.success(`"${newTodo.title}" created successfully!`)
+      // Toast already handled in AddTodo component for better UX
     },
     onError: (error) => {
       toast.error('Failed to create todo: ' + (error instanceof Error ? error.message : 'Unknown error'))
@@ -40,7 +40,7 @@ export function useTodos() {
       return { previousTodos }
     },
     onSuccess: () => {
-      toast.success('Todo updated successfully!')
+      // Toast already handled in TodoItem component for better UX
     },
     onError: (error, _, context) => {
       if (context?.previousTodos) {
@@ -67,7 +67,7 @@ export function useTodos() {
       return { previousTodos, todoTitle: todoToDelete?.title }
     },
     onSuccess: (_, __, context) => {
-      toast.success(`"${context?.todoTitle || 'Todo'}" deleted successfully!`)
+      // Toast already handled in TodoItem component for better UX
     },
     onError: (error, _, context) => {
       if (context?.previousTodos) {
@@ -95,8 +95,17 @@ export function useTodos() {
       return { previousTodos, todoTitle: todo?.title, completed }
     },
     onSuccess: (_, __, context) => {
-      const status = context?.completed ? 'completed' : 'marked as pending'
-      toast.success(`"${context?.todoTitle || 'Todo'}" ${status}!`)
+      // Provide feedback with celebration for completed tasks
+      if (context?.completed) {
+        toast.success(`🎉 ¡"${context.todoTitle}" completada!`, { 
+          duration: 3000,
+          style: { fontSize: '16px' }
+        })
+      } else {
+        toast.success(`⏳ "${context.todoTitle}" marcada como pendiente`, { 
+          duration: 2000 
+        })
+      }
     },
     onError: (error, _, context) => {
       if (context?.previousTodos) {
@@ -109,17 +118,66 @@ export function useTodos() {
     },
   })
 
+  const createShoppingListMutation = useMutation({
+    mutationFn: ({ title, description, items }: { title: string; description?: string; items: string[] }) =>
+      createShoppingList({ title, description, shopping_items: items, user_id: user!.id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos', user?.id] })
+    },
+    onError: (error) => {
+      toast.error('Failed to create shopping list: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    },
+  })
+
+  const updateShoppingItemMutation = useMutation({
+    mutationFn: ({ todoId, itemId, completed }: { todoId: string; itemId: string; completed: boolean }) =>
+      updateShoppingItem({ todoId, itemId, completed }),
+    onMutate: async ({ todoId, itemId, completed }) => {
+      await queryClient.cancelQueries({ queryKey: ['todos', user?.id] })
+      const previousTodos = queryClient.getQueryData<Todo[]>(['todos', user?.id])
+      
+      queryClient.setQueryData<Todo[]>(['todos', user?.id], (old) => 
+        old?.map((todo) => {
+          if (todo.id === todoId && todo.shopping_items) {
+            const updatedItems = todo.shopping_items.map(item =>
+              item.id === itemId ? { ...item, completed } : item
+            )
+            const allCompleted = updatedItems.every(item => item.completed)
+            return { ...todo, shopping_items: updatedItems, completed: allCompleted }
+          }
+          return todo
+        }) || []
+      )
+
+      return { previousTodos }
+    },
+    onSuccess: () => {
+      toast.success('Item updated', { duration: 1000 })
+    },
+    onError: (error, _, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(['todos', user?.id], context.previousTodos)
+      }
+      toast.error('Failed to update item: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos', user?.id] })
+    },
+  })
+
   return {
     todos: query.data || [],
     loading: query.isLoading,
     error: query.error,
     createTodo: createMutation.mutate,
+    createShoppingList: createShoppingListMutation.mutate,
     updateTodo: updateMutation.mutate,
     deleteTodo: deleteMutation.mutate,
     toggleTodo: toggleMutation.mutate,
-    isCreating: createMutation.isPending,
+    toggleShoppingItem: updateShoppingItemMutation.mutate,
+    isCreating: createMutation.isPending || createShoppingListMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    isToggling: toggleMutation.isPending,
+    isToggling: toggleMutation.isPending || updateShoppingItemMutation.isPending,
   }
 }

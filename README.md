@@ -1,28 +1,28 @@
-# 📋 Modern Todo App
+# 📋 Demo Todo App
 
-A production-ready, full-stack todo application built with Next.js 15, Supabase, and TypeScript. Features a beautiful interface, comprehensive testing, and exceptional user experience.
+Una aplicación de demostración para portfolio construida con Next.js 15 y TypeScript. Diseñada para mostrar habilidades de desarrollo frontend moderno sin dependencias externas.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
-![Supabase](https://img.shields.io/badge/Supabase-Database-green?style=flat-square&logo=supabase)
-![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)
 ![Playwright](https://img.shields.io/badge/Playwright-Testing-45ba4b?style=flat-square&logo=playwright)
+![Demo](https://img.shields.io/badge/Portfolio-Demo-gold?style=flat-square&logo=star)
 
 ## ✨ Features
 
 ### Core Functionality
-- 🔐 **Authentication** - Secure email/password auth with Supabase
-- ✅ **Todo Management** - Create, read, update, delete todos with real-time sync
-- 🔍 **Search & Filter** - Find todos instantly and filter by status
-- 📱 **Responsive Design** - Optimized for all devices
-- 🌙 **Dark Mode** - System preference detection + manual toggle
+- 🔐 **Demo Authentication** - Sistema de credenciales demo (demo@todoapp.com / demo123)
+- ✅ **Todo Management** - CRUD completo de todos con actualizaciones optimistas
+- 🔍 **Search & Filter** - Búsqueda instantánea y filtros por estado
+- 📱 **Responsive Design** - Optimizado para todos los dispositivos
+- 🌙 **Dark Mode** - Detección de preferencias del sistema + toggle manual
 
 ### User Experience
-- ⚡ **Optimistic Updates** - Instant feedback with automatic rollback
-- 🍞 **Toast Notifications** - Success/error feedback for all operations
-- 💀 **Loading Skeletons** - Elegant loading states instead of spinners
-- 🎨 **Smooth Animations** - Micro-interactions and transitions
-- 🌐 **Offline Support** - Network status monitoring and indicators
+- ⚡ **Optimistic Updates** - Feedback instantáneo con rollback automático
+- 🍞 **Toast Notifications** - Feedback de éxito/error para todas las operaciones
+- 💀 **Loading Skeletons** - Estados de carga elegantes en lugar de spinners
+- 🎨 **Smooth Animations** - Micro-interacciones y transiciones suaves
+- 💾 **localStorage Storage** - Persistencia de datos sin servidor
 
 ### Accessibility & Quality
 - ♿ **WCAG 2.1 AA** - Full accessibility compliance
@@ -36,7 +36,6 @@ A production-ready, full-stack todo application built with Next.js 15, Supabase,
 ### Prerequisites
 - Node.js 18+ 
 - npm/yarn/pnpm
-- Supabase account
 
 ### Installation
 
@@ -51,30 +50,27 @@ A production-ready, full-stack todo application built with Next.js 15, Supabase,
    npm install
    ```
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Add your Supabase credentials:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   ```
-
-4. **Set up the database**
-   Run the SQL migration in your Supabase dashboard:
-   ```sql
-   -- See supabase-migration.sql for complete setup
-   ```
-
-5. **Start the development server**
+3. **Start the development server**
    ```bash
    npm run dev
    ```
 
-6. **Open in browser**
+4. **Open in browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Demo Usage
+
+1. **Use the demo credentials:**
+   - **Email**: `demo@todoapp.com`
+   - **Password**: `demo123`
+
+2. **Start using the app:**
+   - Create, edit, and delete todos
+   - Experience the optimistic updates
+   - Test the search and filter functionality
+   - Try the dark mode toggle
+
+**¡No setup required!** Todo funciona inmediatamente con localStorage.
 
 ## 🧪 Testing
 
@@ -130,10 +126,10 @@ npm run test:debug
 - **Shadcn/ui** - Beautiful, accessible components
 - **Lucide React** - Modern icon library
 
-### Backend & Database
-- **Supabase** - Backend-as-a-Service
-- **PostgreSQL** - Relational database
-- **Row Level Security** - Database-level access control
+### Storage & Demo
+- **localStorage** - Client-side data persistence
+- **Demo Authentication** - Hardcoded credentials for easy testing
+- **No External Dependencies** - Works offline, no server required
 
 ### State Management & Data Fetching
 - **TanStack Query** - Server state management
@@ -169,11 +165,11 @@ npm run test:debug
 
 ## 🔒 Security Features
 
-- **Row Level Security** - Database-level access control
-- **Environment Variables** - Secure configuration
-- **Input Validation** - Client and server-side validation
+- **Input Validation** - Client-side validation with Zod
+- **XSS Protection** - Sanitized user inputs
 - **Error Boundaries** - Graceful error handling
-- **HTTPS Enforcement** - Secure communication
+- **localStorage Security** - Client-side data isolation
+- **Demo Mode** - No real user data stored
 
 ## 📱 Browser Support
 
@@ -222,11 +218,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [Next.js](https://nextjs.org/) - The React framework
-- [Supabase](https://supabase.com/) - Backend platform
 - [Shadcn/ui](https://ui.shadcn.com/) - Component library
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [Playwright](https://playwright.dev/) - Testing framework
+- [TanStack Query](https://tanstack.com/query) - Data fetching
 
 ---
 
-Built with ❤️ using modern web technologies for exceptional user experience.
+## 📋 Portfolio Demo
+
+Esta aplicación está diseñada específicamente como **demo de portfolio** para mostrar:
+
+- ✅ Desarrollo Frontend Moderno (Next.js 15, TypeScript)
+- ✅ Arquitectura de Componentes Escalable
+- ✅ Estado Global y Optimistic Updates
+- ✅ Testing E2E Comprehensivo
+- ✅ Diseño Responsivo y Accesible
+- ✅ UX/UI Moderna con Dark Mode
+
+**Credenciales Demo**: `demo@todoapp.com` / `demo123`
+
+---
+
+Creado con ❤️ enfocándose en tecnologías modernas y experiencia de usuario excepcional.
+
+**Luis Reche** → [RecheDev](https://github.com/RecheDev)

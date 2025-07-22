@@ -8,43 +8,76 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useTheme } from '@/hooks/useTheme'
+import { useTheme } from '@/components/providers/ThemeProvider'
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { theme, setTheme, actualTheme } = useTheme()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 px-0">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
+          aria-label="Toggle theme"
+        >
+          {actualTheme === 'dark' ? (
+            <Moon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
+          )}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="min-w-40">
         <DropdownMenuItem 
           onClick={() => setTheme('light')}
-          className={theme === 'light' ? 'bg-accent' : ''}
+          className={`cursor-pointer p-3 ${theme === 'light' ? 'bg-accent' : ''}`}
         >
-          <Sun className="h-4 w-4 mr-2" />
+          <Sun className="mr-3 h-4 w-4" />
           Light
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('dark')}
-          className={theme === 'dark' ? 'bg-accent' : ''}
+          className={`cursor-pointer p-3 ${theme === 'dark' ? 'bg-accent' : ''}`}
         >
-          <Moon className="h-4 w-4 mr-2" />
+          <Moon className="mr-3 h-4 w-4" />
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('system')}
-          className={theme === 'system' ? 'bg-accent' : ''}
+          className={`cursor-pointer p-3 ${theme === 'system' ? 'bg-accent' : ''}`}
         >
-          <Monitor className="h-4 w-4 mr-2" />
+          <Monitor className="mr-3 h-4 w-4" />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+export function SimpleThemeToggle() {
+  const { actualTheme, setTheme } = useTheme()
+
+  const toggleTheme = () => {
+    setTheme(actualTheme === 'dark' ? 'light' : 'dark')
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={toggleTheme}
+      className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
+      aria-label={`Switch to ${actualTheme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {actualTheme === 'dark' ? (
+        <Sun className="h-5 w-5" />
+      ) : (
+        <Moon className="h-5 w-5" />
+      )}
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   )
 }

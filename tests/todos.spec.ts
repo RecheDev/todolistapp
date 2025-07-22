@@ -1,7 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
 // Mock authentication helper - in a real app you'd set up test users
-async function mockLogin(page: any) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function mockLogin(page: Page) {
   // For now, we'll just go to dashboard and assume auth is handled
   // In production, you'd want to set up test users and actual login
   await page.goto('/dashboard')
@@ -80,7 +81,7 @@ test.describe('Todo Management', () => {
     await page.getByText('Edit').click()
     
     // Edit the todo
-    const titleInput = page.getByDisplayValue(/Test Todo/i)
+    const titleInput = page.locator('input[value*="Test Todo"]')
     await titleInput.fill('Updated Todo')
     await page.getByRole('button', { name: 'Save' }).click()
     

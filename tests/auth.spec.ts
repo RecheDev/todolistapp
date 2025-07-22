@@ -64,7 +64,7 @@ test.describe('Authentication', () => {
     await expect(passwordInput).toBeFocused()
   })
 
-  test('should redirect authenticated users to dashboard', async ({ page, context }) => {
+  test('should redirect authenticated users to dashboard', async ({ page }) => {
     // This test would need a setup with a test user
     // For now, we'll just test the redirect logic exists
     await page.goto('/')
