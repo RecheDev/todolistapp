@@ -18,9 +18,7 @@ export function ThemeToggle() {
         aria-label="Switch to light mode"
         aria-pressed={actualTheme === 'light'}
       >
-        <Sun className={`h-5 w-5 transition-all duration-200 ${
-          actualTheme === 'light' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'
-        }`} />
+        <Sun className="h-5 w-5" />
         <span className="sr-only">Light mode</span>
       </Button>
 
@@ -33,9 +31,7 @@ export function ThemeToggle() {
         aria-label="Switch to dark mode"
         aria-pressed={actualTheme === 'dark'}
       >
-        <Moon className={`h-5 w-5 transition-all duration-200 ${
-          actualTheme === 'dark' ? 'rotate-0 scale-100' : '-rotate-90 scale-0'
-        }`} />
+        <Moon className="h-5 w-5" />
         <span className="sr-only">Dark mode</span>
       </Button>
     </div>
