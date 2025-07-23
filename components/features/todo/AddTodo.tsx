@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, X, AlertCircle, ShoppingCart } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Plus, X, AlertCircle, ShoppingCart, Calendar, Flag, ChevronDown } from 'lucide-react'
 import { createTodoSchema, type CreateTodoFormData, validateWithSchema, sanitizeTodoInput } from '@/lib/validations'
 import { toast } from 'sonner'
 
 interface AddTodoProps {
-  onAdd: (title: string, description?: string) => void
+  onAdd: (title: string, description?: string, priority?: 'low' | 'medium' | 'high', dueDate?: string) => void
   onAddShoppingList?: (title: string, description: string | undefined, items: string[]) => void
   isCreating?: boolean
 }
@@ -21,6 +23,8 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [shoppingItems, setShoppingItems] = useState('')
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
+  const [dueDate, setDueDate] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof CreateTodoFormData, string>>>({})
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,7 +61,7 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
       onAddShoppingList?.(sanitizedData.title, sanitizedData.description, items)
       toast.success('🛒 ¡Lista de compra creada exitosamente!', { duration: 3000 })
     } else {
-      onAdd(sanitizedData.title, sanitizedData.description)
+      onAdd(sanitizedData.title, sanitizedData.description, priority, dueDate || undefined)
       toast.success('✅ ¡Tarea creada exitosamente!', { duration: 3000 })
     }
     
@@ -65,6 +69,8 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
     setTitle('')
     setDescription('')
     setShoppingItems('')
+    setPriority('medium')
+    setDueDate('')
     setFieldErrors({})
     setIsExpanded(false)
   }
@@ -73,6 +79,8 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
     setTitle('')
     setDescription('')
     setShoppingItems('')
+    setPriority('medium')
+    setDueDate('')
     setTodoType('todo')
     setFieldErrors({})
     setIsExpanded(false)
@@ -233,6 +241,72 @@ Add new task...
               />
               <div className="text-xs text-secondary">
                 Write one item per line. Example: potatoes, water, milk
+              </div>
+            </div>
+          )}
+          
+          {todoType === 'todo' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Priority Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="priority" className="text-sm font-medium flex items-center gap-2">
+                  <Flag className="h-4 w-4" />
+                  Priority
+                </Label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      id="priority"
+                      className="w-full h-12 justify-between border-2 focus:border-primary shadow-input"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={priority === 'high' ? 'text-red-500' : priority === 'medium' ? 'text-blue-500' : 'text-gray-500'}>
+                          {priority === 'high' ? '🔺' : priority === 'medium' ? '🔸' : '🔽'}
+                        </span>
+                        <span>{priority === 'high' ? 'High Priority' : priority === 'medium' ? 'Medium Priority' : 'Low Priority'}</span>
+                      </div>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-full" align="start">
+                    <DropdownMenuItem onClick={() => setPriority('high')} className="cursor-pointer p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-500">🔺</span>
+                        <span>High Priority</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setPriority('medium')} className="cursor-pointer p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-500">🔸</span>
+                        <span>Medium Priority</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setPriority('low')} className="cursor-pointer p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">🔽</span>
+                        <span>Low Priority</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              
+              {/* Due Date Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="due-date" className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Due Date (optional)
+                </Label>
+                <Input
+                  id="due-date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  disabled={isCreating}
+                  className="h-12 border-2 focus:border-primary shadow-input focus:shadow-offset"
+                  min={new Date().toISOString().split('T')[0]}
+                />
               </div>
             </div>
           )}

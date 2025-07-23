@@ -2,12 +2,16 @@
 
 import { useState, useCallback } from 'react'
 import { Todo } from '@/types/database'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PriorityBadge } from '@/components/ui/priority-badge'
+import { DueDateBadge } from '@/components/ui/due-date-badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +32,10 @@ interface TodoItemProps {
   isUpdating?: boolean
   isDeleting?: boolean
   isToggling?: boolean
+  isDragging?: boolean
+  bulkSelectMode?: boolean
+  isSelected?: boolean
+  onSelect?: (selected: boolean) => void
 }
 
 export function TodoItem({
@@ -39,7 +47,24 @@ export function TodoItem({
   isUpdating,
   isDeleting,
   isToggling,
+  isDragging,
+  bulkSelectMode = false,
+  isSelected = false,
+  onSelect,
 }: TodoItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({ id: todo.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(todo.title)
   const [editDescription, setEditDescription] = useState(todo.description || '')
@@ -214,18 +239,35 @@ export function TodoItem({
   }
 
   return (
-    <Card className={`w-full transition-all duration-200 hover:shadow-offset-lg hover:-translate-y-1 bg-background border border-border/50 hover:border-accent/50 shadow-offset ${isDeleting ? 'opacity-50 scale-95' : ''}`}>
+    <Card 
+      ref={setNodeRef}
+      style={style}
+      className={`w-full transition-all duration-200 hover:shadow-offset-lg hover:-translate-y-1 bg-background border border-border/50 hover:border-accent/50 shadow-offset ${
+        isDeleting ? 'opacity-50 scale-95' : ''
+      } ${
+        isSortableDragging || isDragging ? 'z-50 shadow-2xl scale-105 rotate-2' : ''
+      }`}
+    >
       <CardContent className="p-6">
         <div className="flex items-start gap-5">
-          <Checkbox
-            checked={todo.completed}
-            onCheckedChange={(checked) => handleToggleWithProtection(checked as boolean)}
-            disabled={isToggling}
-            className={`mt-2 h-7 w-7 transition-all duration-200 ${
-              isToggling ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
-            }`}
-            aria-label={`Mark "${todo.title}" as ${todo.completed ? 'incomplete' : 'complete'}`}
-          />
+          {bulkSelectMode ? (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => onSelect?.(checked as boolean)}
+              className="mt-2 h-7 w-7 transition-all duration-200 hover:scale-110"
+              aria-label={`Select "${todo.title}" for bulk actions`}
+            />
+          ) : (
+            <Checkbox
+              checked={todo.completed}
+              onCheckedChange={(checked) => handleToggleWithProtection(checked as boolean)}
+              disabled={isToggling}
+              className={`mt-2 h-7 w-7 transition-all duration-200 ${
+                isToggling ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+              }`}
+              aria-label={`Mark "${todo.title}" as ${todo.completed ? 'incomplete' : 'complete'}`}
+            />
+          )}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
@@ -287,9 +329,11 @@ export function TodoItem({
                     disabled={isDeleting || isToggling}
                     aria-label="Todo actions menu"
                     aria-haspopup="menu"
+                    {...attributes}
+                    {...listeners}
                   >
                     <MoreHorizontal className="h-6 w-6" />
-                    <span className="sr-only">Open menu for {todo.title}</span>
+                    <span className="sr-only">Open menu for {todo.title} - drag to reorder</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32" role="menu" aria-label="Todo actions">
@@ -312,13 +356,24 @@ Delete
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-2 mt-4 flex-wrap">
               <Badge variant={todo.completed ? 'secondary' : 'default'} className="text-xs font-semibold px-3 py-1">
                 {todo.type === 'shopping_list' 
                   ? (todo.completed ? '🛒 Complete' : '🛒 List')
                   : (todo.completed ? '✅ Done' : '⏳ Pending')
                 }
               </Badge>
+              
+              {/* Priority Badge */}
+              {todo.priority && (
+                <PriorityBadge priority={todo.priority} />
+              )}
+              
+              {/* Due Date Badge */}
+              {todo.due_date && (
+                <DueDateBadge dueDate={todo.due_date} completed={todo.completed} />
+              )}
+              
               {todo.type === 'shopping_list' && todo.shopping_items && (
                 <span className="text-xs font-medium bg-muted/20 px-2 py-1 rounded text-tertiary">
                   {todo.shopping_items.filter(item => item.completed).length}/{todo.shopping_items.length} items

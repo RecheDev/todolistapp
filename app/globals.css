@@ -30,32 +30,32 @@
   --color-tertiary-text: 215.4 16.3% 65%;
 }
 
-/* Dark theme overrides */
+/* Dark theme overrides - Pure black theme */
 .dark {
-  --color-background: 0 0% 3.9%;
-  --color-foreground: 0 0% 98%;
-  --color-card: 0 0% 6%;
-  --color-card-foreground: 0 0% 98%;
-  --color-popover: 0 0% 3.9%;
-  --color-popover-foreground: 0 0% 98%;
+  --color-background: 0 0% 0%;
+  --color-foreground: 0 0% 100%;
+  --color-card: 0 0% 0%;
+  --color-card-foreground: 0 0% 100%;
+  --color-popover: 0 0% 0%;
+  --color-popover-foreground: 0 0% 100%;
   --color-primary: 210 100% 75%;
-  --color-primary-foreground: 0 0% 8%;
-  --color-secondary: 217.2 32.6% 17.5%;
-  --color-secondary-foreground: 210 40% 98%;
-  --color-muted: 217.2 32.6% 17.5%;
-  --color-muted-foreground: 215 20.2% 65.1%;
-  --color-accent: 217.2 32.6% 17.5%;
-  --color-accent-foreground: 210 40% 98%;
-  --color-destructive: 0 62.8% 30.6%;
-  --color-destructive-foreground: 210 40% 98%;
-  --color-border: 217.2 32.6% 17.5%;
-  --color-input: 217.2 32.6% 17.5%;
+  --color-primary-foreground: 0 0% 0%;
+  --color-secondary: 0 0% 5%;
+  --color-secondary-foreground: 0 0% 100%;
+  --color-muted: 0 0% 5%;
+  --color-muted-foreground: 0 0% 70%;
+  --color-accent: 0 0% 5%;
+  --color-accent-foreground: 0 0% 100%;
+  --color-destructive: 0 62.8% 50%;
+  --color-destructive-foreground: 0 0% 100%;
+  --color-border: 0 0% 15%;
+  --color-input: 0 0% 5%;
   --color-ring: 210 100% 75%;
   
   /* Hierarchical colors for dark theme */
-  --color-primary-text: 0 0% 98%;
-  --color-secondary-text: 215 20.2% 65.1%;
-  --color-tertiary-text: 215 20.2% 50%;
+  --color-primary-text: 0 0% 100%;
+  --color-secondary-text: 0 0% 70%;
+  --color-tertiary-text: 0 0% 50%;
 }
 
 @layer base {

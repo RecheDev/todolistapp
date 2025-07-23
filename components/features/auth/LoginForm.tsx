@@ -32,24 +32,24 @@ export function LoginForm() {
       const errors: Partial<Record<keyof LoginFormData, string>> = {}
       validation.errors.forEach(error => {
         if (error.includes('email')) errors.email = error
-        if (error.includes('contraseña')) errors.password = error
+        if (error.includes('password')) errors.password = error
       })
       setFieldErrors(errors)
       setLoading(false)
-      toast.error('Por favor corrige los errores en el formulario')
+      toast.error('Please fix the errors in the form')
       return
     }
 
     try {
       await signIn(validation.data.email, validation.data.password)
-      toast.success('¡Bienvenido de vuelta!', {
-        description: 'Has iniciado sesión exitosamente'
+      toast.success('Welcome back!', {
+        description: 'You have successfully signed in'
       })
       router.push('/dashboard')
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Ocurrió un error inesperado'
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
       setError(errorMessage)
-      toast.error('Error al iniciar sesión', {
+      toast.error('Sign in error', {
         description: errorMessage
       })
     } finally {
@@ -60,19 +60,19 @@ export function LoginForm() {
   return (
     <Card className="w-full shadow-lg border-border bg-background">
       <CardHeader className="space-y-4 p-6">
-        <CardTitle className="text-2xl md:text-3xl text-center font-bold text-foreground">Iniciar Sesión</CardTitle>
+        <CardTitle className="text-2xl md:text-3xl text-center font-bold text-foreground">Sign In</CardTitle>
         <CardDescription className="text-center text-base md:text-lg text-muted-foreground">
-          Usa las credenciales demo para acceder
+          Use the demo credentials to access
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Correo Electrónico</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Ingresa tu correo electrónico"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value)
@@ -99,11 +99,11 @@ export function LoginForm() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Ingresa tu contraseña"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value)
@@ -140,7 +140,7 @@ export function LoginForm() {
             </div>
           )}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-sm border border-blue-200 dark:border-blue-700">
-            <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">Credenciales Demo:</p>
+            <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">Demo Credentials:</p>
             <p className="text-blue-700 dark:text-blue-300">📧 demo@todoapp.com</p>
             <p className="text-blue-700 dark:text-blue-300">🔑 demo123</p>
           </div>
@@ -150,18 +150,18 @@ export function LoginForm() {
             disabled={loading}
             aria-describedby={loading ? "loading-status" : undefined}
           >
-            {loading ? '⏳ Iniciando sesión...' : '🚀 Iniciar Sesión'}
+            {loading ? '⏳ Signing in...' : '🚀 Sign In'}
           </Button>
           {loading && (
             <div id="loading-status" className="sr-only" aria-live="polite">
-              Iniciando sesión, por favor espere...
+              Signing in, please wait...
             </div>
           )}
         </form>
         <div className="mt-6 text-center text-sm">
-          ¿No tienes cuenta?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-            Crear cuenta
+            Create account
           </Link>
         </div>
       </CardContent>

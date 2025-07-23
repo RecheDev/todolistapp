@@ -1,4 +1,4 @@
-import { Todo, ShoppingItem, CreateShoppingListInput, UpdateShoppingItemInput } from '@/types/database'
+import { Todo, ShoppingItem, CreateShoppingListInput, UpdateShoppingItemInput, BulkAction } from '@/types/database'
 import { safeLocalStorage } from '@/lib/storage'
 
 // Simular delay de red para una mejor UX
@@ -10,10 +10,12 @@ const generateId = () => crypto.randomUUID()
 // Obtener todos del localStorage
 const getTodosFromStorage = (): Todo[] => {
   const todos = safeLocalStorage.getItem<Todo[]>('demo-todos', [])
-  // Migrate old todos to include type field
-  const migratedTodos = (todos || []).map(todo => ({
+  // Migrate old todos to include new fields
+  const migratedTodos = (todos || []).map((todo, index) => ({
     ...todo,
-    type: todo.type || 'todo' as const
+    type: todo.type || 'todo' as const,
+    priority: todo.priority || 'medium' as const,
+    order: todo.order ?? index
   }))
   
   // Save migrated todos back to storage
@@ -33,15 +35,20 @@ export async function getTodos(userId: string): Promise<Todo[]> {
   await delay(300) // Simular latencia de red
   const todos = getTodosFromStorage()
   return todos.filter(todo => todo.user_id === userId)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
 
 export async function createTodo(
   userId: string,
   title: string,
-  description?: string
+  description?: string,
+  priority: 'low' | 'medium' | 'high' = 'medium',
+  due_date?: string
 ): Promise<Todo> {
   await delay(400)
+  
+  const todos = getTodosFromStorage().filter(t => t.user_id === userId)
+  const maxOrder = todos.length > 0 ? Math.max(...todos.map(t => t.order ?? 0)) : 0
   
   const newTodo: Todo = {
     id: generateId(),
@@ -51,12 +58,15 @@ export async function createTodo(
     completed: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    type: 'todo'
+    type: 'todo',
+    priority,
+    due_date,
+    order: maxOrder + 1
   }
   
-  const todos = getTodosFromStorage()
-  todos.push(newTodo)
-  saveTodosToStorage(todos)
+  const allTodos = getTodosFromStorage()
+  allTodos.push(newTodo)
+  saveTodosToStorage(allTodos)
   
   return newTodo
 }
@@ -72,6 +82,9 @@ export async function createShoppingList(
     completed: false
   }))
   
+  const todos = getTodosFromStorage().filter(t => t.user_id === input.user_id)
+  const maxOrder = todos.length > 0 ? Math.max(...todos.map(t => t.order ?? 0)) : 0
+  
   const newShoppingList: Todo = {
     id: generateId(),
     title: input.title,
@@ -81,12 +94,14 @@ export async function createShoppingList(
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     type: 'shopping_list',
-    shopping_items: shoppingItems
+    shopping_items: shoppingItems,
+    priority: 'medium',
+    order: maxOrder + 1
   }
   
-  const todos = getTodosFromStorage()
-  todos.push(newShoppingList)
-  saveTodosToStorage(todos)
+  const allTodos = getTodosFromStorage()
+  allTodos.push(newShoppingList)
+  saveTodosToStorage(allTodos)
   
   return newShoppingList
 }
@@ -129,7 +144,7 @@ export async function updateShoppingItem(
 
 export async function updateTodo(
   id: string,
-  updates: Partial<Pick<Todo, 'title' | 'description' | 'completed'>>
+  updates: Partial<Pick<Todo, 'title' | 'description' | 'completed' | 'priority' | 'due_date' | 'order'>>
 ): Promise<Todo> {
   await delay(300)
   
@@ -153,13 +168,107 @@ export async function updateTodo(
 }
 
 export async function deleteTodo(id: string): Promise<void> {
-  await delay(300)
-  
-  const todos = getTodosFromStorage()
-  const filteredTodos = todos.filter(todo => todo.id !== id)
-  saveTodosToStorage(filteredTodos)
+  await deleteTodoWithUndo(id)
+  // Regular delete without undo capability for legacy compatibility
 }
 
 export async function toggleTodo(id: string, completed: boolean): Promise<Todo> {
   return updateTodo(id, { completed })
+}
+
+// New high-impact features
+export async function reorderTodos(userId: string, todoIds: string[]): Promise<Todo[]> {
+  await delay(200)
+  
+  const todos = getTodosFromStorage()
+  const userTodos = todos.filter(t => t.user_id === userId)
+  const otherTodos = todos.filter(t => t.user_id !== userId)
+  
+  // Update order based on new positions
+  const reorderedTodos = todoIds.map((id, index) => {
+    const todo = userTodos.find(t => t.id === id)
+    if (!todo) throw new Error(`Todo ${id} not found`)
+    return { ...todo, order: index, updated_at: new Date().toISOString() }
+  })
+  
+  const allTodos = [...otherTodos, ...reorderedTodos]
+  saveTodosToStorage(allTodos)
+  
+  return reorderedTodos
+}
+
+export async function bulkAction(userId: string, todoIds: string[], action: BulkAction): Promise<Todo[]> {
+  await delay(300)
+  
+  const todos = getTodosFromStorage()
+  const updatedTodos: Todo[] = []
+  
+  todos.forEach(todo => {
+    if (todo.user_id === userId && todoIds.includes(todo.id)) {
+      switch (action) {
+        case 'delete':
+          // Skip this todo (don't add to updatedTodos)
+          return
+        case 'complete':
+          updatedTodos.push({ ...todo, completed: true, updated_at: new Date().toISOString() })
+          break
+        case 'incomplete':
+          updatedTodos.push({ ...todo, completed: false, updated_at: new Date().toISOString() })
+          break
+      }
+    } else {
+      updatedTodos.push(todo)
+    }
+  })
+  
+  saveTodosToStorage(updatedTodos)
+  
+  return updatedTodos.filter(t => t.user_id === userId && todoIds.includes(t.id))
+}
+
+export async function deleteCompletedTodos(userId: string): Promise<void> {
+  await delay(300)
+  
+  const todos = getTodosFromStorage()
+  const filteredTodos = todos.filter(todo => !(todo.user_id === userId && todo.completed))
+  saveTodosToStorage(filteredTodos)
+}
+
+// Undo functionality - store last deleted todos
+let lastDeletedTodos: { todos: Todo[], timestamp: number } | null = null
+
+export async function deleteTodoWithUndo(id: string): Promise<{ todo: Todo }> {
+  await delay(300)
+  
+  const todos = getTodosFromStorage()
+  const todoToDelete = todos.find(t => t.id === id)
+  
+  if (!todoToDelete) {
+    throw new Error('Todo not found')
+  }
+  
+  const filteredTodos = todos.filter(todo => todo.id !== id)
+  saveTodosToStorage(filteredTodos)
+  
+  // Store for undo
+  lastDeletedTodos = { todos: [todoToDelete], timestamp: Date.now() }
+  
+  return { todo: todoToDelete }
+}
+
+export async function undoDelete(): Promise<Todo[]> {
+  if (!lastDeletedTodos || Date.now() - lastDeletedTodos.timestamp > 10000) {
+    throw new Error('Nothing to undo or undo expired')
+  }
+  
+  await delay(200)
+  
+  const todos = getTodosFromStorage()
+  const restoredTodos = [...todos, ...lastDeletedTodos.todos]
+  saveTodosToStorage(restoredTodos)
+  
+  const result = lastDeletedTodos.todos
+  lastDeletedTodos = null
+  
+  return result
 }
