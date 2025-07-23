@@ -368,7 +368,8 @@ export default function DashboardPage() {
           onSelectTodo={handleSelectTodo}
         />
       </main>
-      <ThemeDebug />
+      {(process.env.NODE_ENV === 'development' ||
+        process.env.NEXT_PUBLIC_THEME_DEBUG === 'true') && <ThemeDebug />}
     </div>
   )
 }
