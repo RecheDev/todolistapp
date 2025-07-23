@@ -1,28 +1,31 @@
 import { test, expect, Page } from '@playwright/test'
 
-// Mock authentication helper - in a real app you'd set up test users
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Mock authentication helper using demo credentials
 async function mockLogin(page: Page) {
-  // For now, we'll just go to dashboard and assume auth is handled
-  // In production, you'd want to set up test users and actual login
-  await page.goto('/dashboard')
+  // Use the demo credentials from CLAUDE.md
+  await page.goto('/login')
+  await page.getByLabel('Email').fill('demo@todoapp.com')
+  await page.getByLabel('Password').fill('demo123')
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  
+  // Wait for redirect to dashboard
+  await page.waitForURL('/dashboard')
 }
 
 test.describe('Todo Management', () => {
   test.beforeEach(async ({ page }) => {
-    // In a real test, you'd authenticate first
-    // await mockLogin(page)
-    await page.goto('/dashboard')
+    // Authenticate with demo credentials before each test
+    await mockLogin(page)
   })
 
-  test.skip('should display dashboard with header and stats', async ({ page }) => {
+  test('should display dashboard with header and stats', async ({ page }) => {
     await expect(page.getByText('My Todos')).toBeVisible()
     await expect(page.getByText(/total/)).toBeVisible()
     await expect(page.getByText(/pending/)).toBeVisible()
     await expect(page.getByText(/completed/)).toBeVisible()
   })
 
-  test.skip('should have search functionality', async ({ page }) => {
+  test('should have search functionality', async ({ page }) => {
     const searchInput = page.getByPlaceholder('Search todos...')
     await expect(searchInput).toBeVisible()
     
@@ -31,7 +34,7 @@ test.describe('Todo Management', () => {
     // Would need to verify search results
   })
 
-  test.skip('should have filter functionality', async ({ page }) => {
+  test('should have filter functionality', async ({ page }) => {
     const filterButton = page.getByRole('button', { name: /All Todos/i })
     await expect(filterButton).toBeVisible()
     
@@ -40,7 +43,7 @@ test.describe('Todo Management', () => {
     await expect(page.getByText('Completed')).toBeVisible()
   })
 
-  test.skip('should display add todo form', async ({ page }) => {
+  test('should display add todo form', async ({ page }) => {
     // Check for add todo button/form
     await expect(page.getByText('Add a new todo...')).toBeVisible()
     
@@ -50,7 +53,7 @@ test.describe('Todo Management', () => {
     await expect(page.getByPlaceholder('Description (optional)')).toBeVisible()
   })
 
-  test.skip('should create a new todo', async ({ page }) => {
+  test('should create a new todo', async ({ page }) => {
     // Click add todo
     await page.getByText('Add a new todo...').click()
     
@@ -66,7 +69,7 @@ test.describe('Todo Management', () => {
     await expect(page.getByText('Test Description')).toBeVisible()
   })
 
-  test.skip('should toggle todo completion', async ({ page }) => {
+  test('should toggle todo completion', async ({ page }) => {
     // Assuming a todo exists, find its checkbox
     const checkbox = page.getByRole('checkbox').first()
     await checkbox.check()
@@ -75,7 +78,7 @@ test.describe('Todo Management', () => {
     await expect(page.locator('.line-through').first()).toBeVisible()
   })
 
-  test.skip('should edit todo', async ({ page }) => {
+  test('should edit todo', async ({ page }) => {
     // Click more menu on first todo
     await page.getByRole('button', { name: 'Open menu' }).first().click()
     await page.getByText('Edit').click()
@@ -89,7 +92,7 @@ test.describe('Todo Management', () => {
     await expect(page.getByText('Updated Todo')).toBeVisible()
   })
 
-  test.skip('should delete todo', async ({ page }) => {
+  test('should delete todo', async ({ page }) => {
     // Click more menu on first todo
     await page.getByRole('button', { name: 'Open menu' }).first().click()
     await page.getByText('Delete').click()
@@ -98,7 +101,7 @@ test.describe('Todo Management', () => {
     // Would need to verify the specific todo is gone
   })
 
-  test.skip('should handle keyboard shortcuts', async ({ page }) => {
+  test('should handle keyboard shortcuts', async ({ page }) => {
     // Test Cmd+Enter to submit todo
     await page.getByText('Add a new todo...').click()
     await page.getByPlaceholder('What needs to be done?').fill('Keyboard Test')
@@ -108,7 +111,7 @@ test.describe('Todo Management', () => {
     await expect(page.getByText('Keyboard Test')).toBeVisible()
   })
 
-  test.skip('should be responsive on mobile', async ({ page }) => {
+  test('should be responsive on mobile', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 })
     
@@ -119,8 +122,8 @@ test.describe('Todo Management', () => {
 })
 
 test.describe('Accessibility', () => {
-  test.skip('should have proper ARIA labels', async ({ page }) => {
-    await page.goto('/dashboard')
+  test('should have proper ARIA labels', async ({ page }) => {
+    await mockLogin(page)
     
     // Check checkbox has proper aria-label
     const checkbox = page.getByRole('checkbox').first()
@@ -131,16 +134,16 @@ test.describe('Accessibility', () => {
     await expect(menuButton).toBeVisible()
   })
 
-  test.skip('should support keyboard navigation', async ({ page }) => {
-    await page.goto('/dashboard')
+  test('should support keyboard navigation', async ({ page }) => {
+    await mockLogin(page)
     
     // Tab through interactive elements
     await page.keyboard.press('Tab')
     // Verify focus moves through elements properly
   })
 
-  test.skip('should have proper heading structure', async ({ page }) => {
-    await page.goto('/dashboard')
+  test('should have proper heading structure', async ({ page }) => {
+    await mockLogin(page)
     
     // Check h1 exists
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()

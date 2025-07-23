@@ -18,7 +18,9 @@ export function ThemeToggle() {
         aria-label="Switch to light mode"
         aria-pressed={actualTheme === 'light'}
       >
-        <Sun className="h-5 w-5" />
+        <Sun className={`h-5 w-5 transition-all duration-200 ${
+          actualTheme === 'light' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'
+        }`} />
         <span className="sr-only">Light mode</span>
       </Button>
 
@@ -31,7 +33,9 @@ export function ThemeToggle() {
         aria-label="Switch to dark mode"
         aria-pressed={actualTheme === 'dark'}
       >
-        <Moon className="h-5 w-5" />
+        <Moon className={`h-5 w-5 transition-all duration-200 ${
+          actualTheme === 'dark' ? 'rotate-0 scale-100' : '-rotate-90 scale-0'
+        }`} />
         <span className="sr-only">Dark mode</span>
       </Button>
     </div>
@@ -53,11 +57,14 @@ export function SimpleThemeToggle() {
       className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
       aria-label={`Switch to ${actualTheme === 'dark' ? 'light' : 'dark'} mode`}
     >
-      {actualTheme === 'dark' ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
+      <div className="relative h-5 w-5">
+        <Sun className={`absolute h-5 w-5 transition-all duration-200 ${
+          actualTheme === 'dark' ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'
+        }`} />
+        <Moon className={`absolute h-5 w-5 transition-all duration-200 ${
+          actualTheme === 'dark' ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
+        }`} />
+      </div>
       <span className="sr-only">Toggle theme</span>
     </Button>
   )

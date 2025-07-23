@@ -101,11 +101,6 @@ export function ThemeProvider({
     setThemeState(newTheme)
   }
 
-  // Don't render anything on server to avoid hydration mismatch
-  if (!mounted) {
-    return null
-  }
-
   const value = {
     theme,
     systemTheme,

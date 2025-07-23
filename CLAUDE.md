@@ -82,6 +82,18 @@ This is a **portfolio demo** todo application built with Next.js 15.4.3 (App Rou
 - Full TypeScript strict mode compliance
 - Zod validation for forms
 
+### Advanced Features
+
+**Drag & Drop System**: Uses `@dnd-kit` for accessible todo reordering with touch support. Implementation in `components/features/todo/TodoList.tsx` with proper keyboard navigation and screen reader announcements.
+
+**Bulk Operations**: Multi-select todos with keyboard shortcuts (Cmd/Ctrl+A) and bulk actions (complete, delete, priority changes). Selection state managed in `useTodos.ts` hook.
+
+**Priority & Due Date System**: Three priority levels (low, medium, high) with visual indicators and due date management. Priority affects sorting order and visual prominence.
+
+**Shopping List Mode**: Extended todo type with sub-items and quantities. Toggle between regular todos and shopping lists with different UI patterns.
+
+**Search & Filtering**: Real-time search with 300ms debouncing, multiple filter options (completed, priority, due date). Implemented with URL state persistence for bookmarkable filtered views.
+
 ### Important Implementation Details
 
 **Theme System**: The dark mode uses pure black backgrounds (`--color-background: 0 0% 0%`) defined in `app/globals.css`. Any component using `bg-background` or `bg-card` will automatically get the correct colors.
@@ -93,6 +105,18 @@ This is a **portfolio demo** todo application built with Next.js 15.4.3 (App Rou
 **Demo Credentials**: Always use `demo@todoapp.com` / `demo123` - these are hardcoded in `context/AuthContext.tsx` and pre-filled in forms.
 
 **Testing Configuration**: Playwright runs tests across multiple browsers (Chromium, Firefox, WebKit) and mobile viewports (Pixel 5, iPhone 12). The dev server starts automatically during testing with `npm test`.
+
+**Keyboard Shortcuts**: 
+- `Cmd/Ctrl + K`: Focus search input
+- `Cmd/Ctrl + Shift + A/P/C`: Apply filters (All, Pending, Completed)
+- `Tab navigation`: Full keyboard accessibility throughout the app
+- `Enter/Space`: Activate buttons and toggle todos
+
+**Error Handling**: 
+- Toast notifications via Sonner for user feedback
+- Error boundaries for graceful failure recovery
+- Network status detection for offline scenarios
+- Form validation with field-level error messages
 
 ## Development Notes
 

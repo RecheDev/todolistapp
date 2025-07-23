@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Plus, X, AlertCircle, ShoppingCart, Calendar, Flag, ChevronDown } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { createTodoSchema, type CreateTodoFormData, validateWithSchema, sanitizeTodoInput } from '@/lib/validations'
 import { toast } from 'sonner'
 
@@ -177,10 +178,10 @@ Add new task...
               required
               aria-label="Todo title"
               aria-describedby={fieldErrors.title ? "title-error" : "title-help"}
-              className={`h-16 text-lg transition-all duration-200 shadow-input focus:shadow-offset ${
+              className={`h-16 text-lg transition-all duration-200 border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md ${
                 fieldErrors.title 
-                  ? 'border-2 border-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10' 
-                  : 'border-2 focus:border-primary'
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
+                  : ''
               }`}
               aria-invalid={fieldErrors.title ? "true" : "false"}
             />
@@ -210,10 +211,10 @@ Add new task...
               rows={3}
               aria-label="Todo description (optional)"
               aria-describedby={fieldErrors.description ? "description-error" : "description-help"}
-              className={`text-base transition-all duration-200 resize-none shadow-input focus:shadow-offset ${
+              className={`text-base transition-all duration-200 resize-none border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md ${
                 fieldErrors.description 
-                  ? 'border-2 border-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10' 
-                  : 'border-2 focus:border-primary'
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
+                  : ''
               }`}
               aria-invalid={fieldErrors.description ? "true" : "false"}
             />
@@ -237,7 +238,7 @@ Add new task...
                 disabled={isCreating}
                 rows={4}
                 aria-label="Shopping list items"
-                className="text-base border-2 transition-all duration-200 resize-none focus:border-primary shadow-input focus:shadow-offset"
+                className="text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 resize-none focus:shadow-md"
               />
               <div className="text-xs text-secondary">
                 Write one item per line. Example: potatoes, water, milk
@@ -258,11 +259,11 @@ Add new task...
                     <Button 
                       variant="outline" 
                       id="priority"
-                      className="w-full h-12 justify-between border-2 focus:border-primary shadow-input"
+                      className="w-full h-12 justify-between"
                     >
                       <div className="flex items-center gap-2">
-                        <span className={priority === 'high' ? 'text-red-500' : priority === 'medium' ? 'text-blue-500' : 'text-gray-500'}>
-                          {priority === 'high' ? '🔺' : priority === 'medium' ? '🔸' : '🔽'}
+                        <span className={priority === 'high' ? 'text-red-600' : priority === 'medium' ? 'text-blue-600' : 'text-gray-600'}>
+                          {priority === 'high' ? '🔴' : priority === 'medium' ? '🔶' : '⬇️'}
                         </span>
                         <span>{priority === 'high' ? 'High Priority' : priority === 'medium' ? 'Medium Priority' : 'Low Priority'}</span>
                       </div>
@@ -272,19 +273,19 @@ Add new task...
                   <DropdownMenuContent className="w-full" align="start">
                     <DropdownMenuItem onClick={() => setPriority('high')} className="cursor-pointer p-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-red-500">🔺</span>
+                        <span className="text-red-600 font-semibold">🔴</span>
                         <span>High Priority</span>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setPriority('medium')} className="cursor-pointer p-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-blue-500">🔸</span>
+                        <span className="text-blue-600">🔶</span>
                         <span>Medium Priority</span>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setPriority('low')} className="cursor-pointer p-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-500">🔽</span>
+                        <span className="text-gray-600">⬇️</span>
                         <span>Low Priority</span>
                       </div>
                     </DropdownMenuItem>
@@ -304,7 +305,7 @@ Add new task...
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   disabled={isCreating}
-                  className="h-12 border-2 focus:border-primary shadow-input focus:shadow-offset"
+                  className="h-12 border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md"
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
@@ -317,13 +318,15 @@ Add new task...
               className="flex-1 h-12 text-base"
               size="lg"
             >
-              {todoType === 'shopping_list' ? (
+              {isCreating ? (
+                <Spinner size="sm" className="mr-2" />
+              ) : todoType === 'shopping_list' ? (
                 <ShoppingCart className="h-4 w-4 mr-2" />
               ) : (
                 <Plus className="h-4 w-4 mr-2" />
               )}
               {isCreating 
-                ? '⏳ Creating...' 
+                ? 'Creating...' 
                 : todoType === 'shopping_list' 
                   ? '🛒 Create Shopping List' 
                   : '✅ Create Task'

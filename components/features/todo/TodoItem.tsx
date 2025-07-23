@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { MoreHorizontal, Edit, Trash2, Save, X, AlertCircle } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { format } from 'date-fns'
 import { updateTodoSchema, type UpdateTodoFormData, validateWithSchema, sanitizeTodoInput } from '@/lib/validations'
 import { toast } from 'sonner'
@@ -145,7 +146,7 @@ export function TodoItem({
 
   if (isEditing) {
     return (
-      <Card className="w-full bg-background border border-border">
+      <Card className="w-full bg-background border-0 shadow-sm">
         <CardContent className="p-4 space-y-4">
           <div className="space-y-2">
             <Input
@@ -164,10 +165,10 @@ export function TodoItem({
               required
               aria-label="Editar título de la tarea"
               aria-describedby={fieldErrors.title ? "edit-title-error" : "edit-title-help"}
-              className={`h-12 text-base border-2 transition-all duration-200 ${
+              className={`h-12 text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 focus:shadow-md ${
                 fieldErrors.title 
-                  ? 'border-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10' 
-                  : 'focus:border-foreground'
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
+                  : ''
               }`}
               aria-invalid={fieldErrors.title ? "true" : "false"}
             />
@@ -197,10 +198,10 @@ export function TodoItem({
               rows={3}
               aria-label="Editar descripción de la tarea (opcional)"
               aria-describedby={fieldErrors.description ? "edit-description-error" : "edit-description-help"}
-              className={`text-base border-2 transition-all duration-200 resize-none ${
+              className={`text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 resize-none focus:shadow-md ${
                 fieldErrors.description 
-                  ? 'border-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10' 
-                  : 'focus:border-foreground'
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
+                  : ''
               }`}
               aria-invalid={fieldErrors.description ? "true" : "false"}
             />
@@ -221,8 +222,12 @@ export function TodoItem({
               className="flex-1 h-12 text-base"
               size="lg"
             >
-              <Save className="h-4 w-4 mr-2" />
-              {isSubmitting ? '⏳ Guardando...' : '💾 Guardar'}
+              {isSubmitting ? (
+                <Spinner size="sm" className="mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {isSubmitting ? 'Guardando...' : '💾 Guardar'}
             </Button>
             <Button
               variant="outline"
@@ -242,7 +247,7 @@ export function TodoItem({
     <Card 
       ref={setNodeRef}
       style={style}
-      className={`w-full transition-all duration-200 hover:shadow-offset-lg hover:-translate-y-1 bg-background border border-border/50 hover:border-accent/50 shadow-offset ${
+      className={`w-full transition-all duration-200 hover:shadow-offset-lg hover:-translate-y-1 bg-background shadow-sm hover:shadow-md ${
         isDeleting ? 'opacity-50 scale-95' : ''
       } ${
         isSortableDragging || isDragging ? 'z-50 shadow-2xl scale-105 rotate-2' : ''
@@ -260,7 +265,17 @@ export function TodoItem({
           ) : (
             <Checkbox
               checked={todo.completed}
-              onCheckedChange={(checked) => handleToggleWithProtection(checked as boolean)}
+              onCheckedChange={(checked) => {
+                handleToggleWithProtection(checked as boolean)
+                if (checked) {
+                  // Add celebration animation for completion
+                  setTimeout(() => {
+                    const checkbox = document.querySelector(`[aria-label*="${todo.title}"]`)
+                    checkbox?.classList.add('animate-success')
+                    setTimeout(() => checkbox?.classList.remove('animate-success'), 1000)
+                  }, 100)
+                }
+              }}
               disabled={isToggling}
               className={`mt-2 h-7 w-7 transition-all duration-200 ${
                 isToggling ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'

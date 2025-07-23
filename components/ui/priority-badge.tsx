@@ -8,22 +8,22 @@ interface PriorityBadgeProps {
 
 export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
   const variants = {
-    low: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-    medium: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300',
-    high: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300'
+    low: 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600',
+    medium: 'bg-blue-500 text-white dark:bg-blue-600 dark:text-white border border-blue-600 dark:border-blue-500 shadow-sm',
+    high: 'bg-red-600 text-white dark:bg-red-500 dark:text-white border-2 border-red-700 dark:border-red-400 shadow-md font-semibold'
   }
 
   const icons = {
-    low: '🔽',
-    medium: '🔸', 
-    high: '🔺'
+    low: '⬇️',
+    medium: '🔶', 
+    high: '🔴'
   }
 
   return (
     <Badge 
       variant="outline" 
       className={cn(
-        'text-xs font-medium px-2 py-0.5 border-0',
+        'text-xs px-2 py-1',
         variants[priority],
         className
       )}

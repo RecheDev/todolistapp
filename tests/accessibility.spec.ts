@@ -1,5 +1,14 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+
+// Mock authentication helper using demo credentials
+async function mockLogin(page: Page) {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill('demo@todoapp.com')
+  await page.getByLabel('Password').fill('demo123')
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  await page.waitForURL('/dashboard')
+}
 
 test.describe('Accessibility', () => {
   test('home page should be accessible', async ({ page }) => {
@@ -23,9 +32,9 @@ test.describe('Accessibility', () => {
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test.skip('dashboard should be accessible', async ({ page }) => {
-    // Skip until we have proper auth setup
-    await page.goto('/dashboard')
+  test('dashboard should be accessible', async ({ page }) => {
+    // Authenticate with demo credentials first
+    await mockLogin(page)
     
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
