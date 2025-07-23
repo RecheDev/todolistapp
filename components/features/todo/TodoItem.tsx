@@ -300,7 +300,7 @@ export function TodoItem({
                     className={`text-base mt-2 break-words leading-relaxed font-normal ${
                       todo.completed
                         ? 'text-tertiary line-through'
-                        : 'text-secondary'
+                        : 'text-secondary-foreground'
                     }`}
                   >
                     {todo.description}
@@ -308,7 +308,7 @@ export function TodoItem({
                 )}
                 {todo.type === 'shopping_list' && todo.shopping_items && (
                   <div className="mt-4 space-y-3 bg-muted/10 p-4 rounded-lg shadow-inset">
-                    <div className="text-sm font-semibold mb-3 text-secondary">Shopping items:</div>
+                    <div className="text-sm font-semibold mb-3 text-secondary-foreground">Shopping items:</div>
                     {todo.shopping_items.map((item) => (
                       <div key={item.id} className="flex items-center gap-4 p-2 rounded hover:bg-accent/50 transition-colors">
                         <Checkbox

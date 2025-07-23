@@ -34,7 +34,7 @@ export function DashboardHeader({ stats, isOnline, userEmail, onLogout }: Dashbo
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm hidden md:inline font-medium bg-muted/30 px-3 py-1 rounded text-secondary">
+          <span className="text-sm hidden md:inline font-medium bg-muted/30 px-3 py-1 rounded text-secondary-foreground">
             {userEmail}
           </span>
           <ThemeToggle />
