@@ -139,10 +139,10 @@ export function LoginForm() {
               {error}
             </div>
           )}
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-sm border border-blue-200 dark:border-blue-700">
-            <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">Demo Credentials:</p>
-            <p className="text-blue-700 dark:text-blue-300">📧 demo@todoapp.com</p>
-            <p className="text-blue-700 dark:text-blue-300">🔑 demo123</p>
+          <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg text-sm border border-primary/20 dark:border-primary/30">
+            <p className="font-semibold text-foreground mb-2">Demo Credentials:</p>
+            <p className="text-foreground font-medium">📧 demo@todoapp.com</p>
+            <p className="text-foreground font-medium">🔑 demo123</p>
           </div>
           <Button 
             type="submit" 

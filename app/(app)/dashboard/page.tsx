@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LogOut } from 'lucide-react'
+import { ThemeDebug } from '@/components/ui/theme-debug'
 
 // Lazy load heavy components
 const AddTodo = lazy(() => import('@/components/features/todo/AddTodo').then(module => ({ default: module.AddTodo })))
@@ -367,6 +368,7 @@ export default function DashboardPage() {
           onSelectTodo={handleSelectTodo}
         />
       </main>
+      <ThemeDebug />
     </div>
   )
 }

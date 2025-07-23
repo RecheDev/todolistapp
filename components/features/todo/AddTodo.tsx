@@ -101,7 +101,7 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
         <CardContent className="p-6">
           <Button
             variant="ghost"
-            className="w-full h-16 justify-start text-secondary hover:bg-accent/70 text-lg font-medium transition-all duration-200 border-2 border-dashed border-secondary/30 hover:border-primary/50"
+            className="w-full h-16 justify-start text-muted-foreground hover:text-foreground hover:bg-accent/70 text-lg font-medium transition-all duration-200 border-2 border-dashed border-muted/40 hover:border-primary/50"
             onClick={() => setIsExpanded(true)}
           >
             <Plus className="h-6 w-6 mr-3" />
@@ -240,7 +240,7 @@ Add new task...
                 aria-label="Shopping list items"
                 className="text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 resize-none focus:shadow-md"
               />
-              <div className="text-xs text-secondary">
+              <div className="text-xs text-muted-foreground">
                 Write one item per line. Example: potatoes, water, milk
               </div>
             </div>

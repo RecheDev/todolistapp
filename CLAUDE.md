@@ -44,7 +44,7 @@ This is a **portfolio demo** todo application built with Next.js 15.4.3 (App Rou
 - `app/layout.tsx` - Root layout with providers and theme setup
 
 **Component organization**:
-- `components/features/` - Feature-specific components (auth, todo)
+- `components/features/` - Feature-specific components (auth, todo, dashboard)
 - `components/ui/` - Reusable UI components (Radix-based with custom styling)
 - `components/providers.tsx` - Global providers (QueryClient, AuthProvider, ThemeProvider)
 
