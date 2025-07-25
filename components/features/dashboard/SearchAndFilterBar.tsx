@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { MdViewList, MdSchedule, MdCheckCircle, MdSelectAll, MdDelete } from 'react-icons/md'
+import { SearchErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 type FilterType = 'all' | 'pending' | 'completed'
 
@@ -24,7 +25,7 @@ interface SearchAndFilterBarProps {
   onDeleteCompleted: () => void
 }
 
-export const SearchAndFilterBar = forwardRef<HTMLInputElement, SearchAndFilterBarProps>(
+const SearchAndFilterBarInternal = forwardRef<HTMLInputElement, SearchAndFilterBarProps>(
   ({
     searchQuery,
     filter,
@@ -127,6 +128,16 @@ export const SearchAndFilterBar = forwardRef<HTMLInputElement, SearchAndFilterBa
       </div>
     )
   }
+)
+
+SearchAndFilterBarInternal.displayName = 'SearchAndFilterBarInternal'
+
+export const SearchAndFilterBar = forwardRef<HTMLInputElement, SearchAndFilterBarProps>(
+  (props, ref) => (
+    <SearchErrorBoundary>
+      <SearchAndFilterBarInternal {...props} ref={ref} />
+    </SearchErrorBoundary>
+  )
 )
 
 SearchAndFilterBar.displayName = 'SearchAndFilterBar'

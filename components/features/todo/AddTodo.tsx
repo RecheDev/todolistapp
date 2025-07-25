@@ -12,6 +12,7 @@ import { MdTask, MdShoppingCart, MdPriorityHigh, MdRemove, MdExpandMore } from '
 import { Spinner } from '@/components/ui/spinner'
 import { createTodoSchema, type CreateTodoFormData, validateWithSchema, sanitizeTodoInput } from '@/lib/validations'
 import { toast } from 'sonner'
+import { AddTodoErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 interface AddTodoProps {
   onAdd: (title: string, description?: string, priority?: 'low' | 'medium' | 'high', dueDate?: string) => void
@@ -19,7 +20,7 @@ interface AddTodoProps {
   isCreating?: boolean
 }
 
-export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) {
+function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [todoType, setTodoType] = useState<'todo' | 'shopping_list'>('todo')
   const [title, setTitle] = useState('')
@@ -350,5 +351,13 @@ export function AddTodo({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) 
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+export function AddTodo(props: AddTodoProps) {
+  return (
+    <AddTodoErrorBoundary>
+      <AddTodoInternal {...props} />
+    </AddTodoErrorBoundary>
   )
 }

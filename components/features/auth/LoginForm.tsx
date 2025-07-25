@@ -10,8 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/hooks/useAuth'
 import { loginSchema, type LoginFormData, validateWithSchema } from '@/lib/validations'
 import Link from 'next/link'
+import { AuthErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
-export function LoginForm() {
+function LoginFormInternal() {
   const [email, setEmail] = useState('demo@todoapp.com')
   const [password, setPassword] = useState('demo123')
   const [loading, setLoading] = useState(false)
@@ -166,5 +167,13 @@ export function LoginForm() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+export function LoginForm() {
+  return (
+    <AuthErrorBoundary>
+      <LoginFormInternal />
+    </AuthErrorBoundary>
   )
 }

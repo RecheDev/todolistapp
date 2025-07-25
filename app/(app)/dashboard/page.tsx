@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect, useRef, Suspense, lazy } from 'react'
+import { useRef, Suspense, lazy } from 'react'
 import { useTodos } from '@/hooks/useTodos'
 import { useAuth } from '@/hooks/useAuth'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useSearchAndFilter } from '@/hooks/useSearchAndFilter'
+import { useTodoStats } from '@/hooks/useTodoStats'
+import { useTodoSelection } from '@/hooks/useTodoSelection'
+import { useDashboardKeyboard } from '@/hooks/useDashboardKeyboard'
+import { useTodoHandlers } from '@/hooks/useTodoHandlers'
 import { TodoListSkeleton } from '@/components/features/todo/TodoSkeleton'
-import { DragEndEvent } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
 import { 
   DashboardHeader,
   MobileStats,
@@ -19,14 +21,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LogOut } from 'lucide-react'
 import { ThemeDebug } from '@/components/ui/theme-debug'
+import { DashboardErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 // Lazy load heavy components
 const AddTodo = lazy(() => import('@/components/features/todo/AddTodo').then(module => ({ default: module.AddTodo })))
-// Dark mode only - no theme toggle needed
 
-type FilterType = 'all' | 'pending' | 'completed'
-
-export default function DashboardPage() {
+function DashboardPageInternal() {
   const { user, signOut } = useAuth()
   const { isOnline } = useNetworkStatus()
   const {
@@ -38,7 +38,7 @@ export default function DashboardPage() {
     updateTodo,
     deleteTodo,
     toggleTodo,
-    toggleShoppingItem,
+    updateShoppingItem,
     reorderTodos,
     bulkAction,
     deleteCompleted,
@@ -50,162 +50,39 @@ export default function DashboardPage() {
     isBulkAction,
   } = useTodos()
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filter, setFilter] = useState<FilterType>('all')
-  const [selectedTodos, setSelectedTodos] = useState<Set<string>>(new Set())
-  const [bulkSelectMode, setBulkSelectMode] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   
+  // Custom hooks for focused responsibilities
+  const { searchQuery, setSearchQuery, filter, setFilter, filteredTodos } = useSearchAndFilter(todos)
+  const stats = useTodoStats(todos)
+  const { selectedTodos, bulkSelectMode, setBulkSelectMode, handleSelectTodo, handleSelectAll, clearSelection } = useTodoSelection()
   
-  // Debounce search query to avoid excessive filtering
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+  const {
+    handleLogout,
+    handleCreateTodo,
+    handleToggleTodo,
+    handleUpdateTodo,
+    handleDeleteTodo,
+    handleDragEnd,
+    handleBulkComplete,
+    handleBulkIncomplete,
+    handleBulkDelete,
+    handleDeleteCompleted
+  } = useTodoHandlers({
+    createTodo,
+    updateTodo,
+    deleteTodo,
+    toggleTodo,
+    reorderTodos,
+    bulkAction,
+    deleteCompleted,
+    signOut,
+    filteredTodos,
+    allTodos: todos
+  })
 
-  // Memoized filter and search todos
-  const filteredTodos = useMemo(() => {
-    return todos
-      .filter((todo) => {
-        if (filter === 'completed') return todo.completed
-        if (filter === 'pending') return !todo.completed
-        return true
-      })
-      .filter((todo) => {
-        const query = debouncedSearchQuery.toLowerCase()
-        if (!query) return true
-        return todo.title.toLowerCase().includes(query) ||
-               (todo.description?.toLowerCase().includes(query) ?? false)
-      })
-  }, [todos, filter, debouncedSearchQuery])
-
-  // Memoized stats calculation
-  const stats = useMemo(() => {
-    const completed = todos.filter((t) => t.completed).length
-    return {
-      total: todos.length,
-      completed,
-      pending: todos.length - completed,
-    }
-  }, [todos])
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
-  }, [signOut])
-
-  const handleCreateTodo = useCallback((title: string, description?: string, priority?: 'low' | 'medium' | 'high', due_date?: string) => {
-    createTodo({ title, description, priority, due_date })
-  }, [createTodo])
-
-  const handleToggleTodo = useCallback((id: string, completed: boolean) => {
-    toggleTodo({ id, completed })
-  }, [toggleTodo])
-
-  const handleUpdateTodo = useCallback((id: string, updates: { title: string; description?: string }) => {
-    updateTodo({ id, updates })
-  }, [updateTodo])
-
-  const handleDeleteTodo = useCallback((id: string) => {
-    deleteTodo(id)
-  }, [deleteTodo])
-  
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-    
-    if (!over || active.id === over.id) {
-      return
-    }
-    
-    const oldIndex = filteredTodos.findIndex(todo => todo.id === active.id)
-    const newIndex = filteredTodos.findIndex(todo => todo.id === over.id)
-    
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const reorderedTodos = arrayMove(filteredTodos, oldIndex, newIndex)
-      const todoIds = reorderedTodos.map(todo => todo.id)
-      reorderTodos(todoIds)
-    }
-  }, [filteredTodos, reorderTodos])
-  
-  const handleSelectTodo = useCallback((todoId: string, selected: boolean) => {
-    setSelectedTodos(prev => {
-      const newSelection = new Set(prev)
-      if (selected) {
-        newSelection.add(todoId)
-      } else {
-        newSelection.delete(todoId)
-      }
-      return newSelection
-    })
-  }, [])
-  
-  const handleSelectAll = useCallback(() => {
-    if (selectedTodos.size === filteredTodos.length) {
-      setSelectedTodos(new Set())
-    } else {
-      setSelectedTodos(new Set(filteredTodos.map(todo => todo.id)))
-    }
-  }, [selectedTodos.size, filteredTodos])
-  
-  const handleBulkComplete = useCallback(() => {
-    if (selectedTodos.size > 0) {
-      bulkAction({ todoIds: Array.from(selectedTodos), action: 'complete' })
-      setSelectedTodos(new Set())
-    }
-  }, [selectedTodos, bulkAction])
-  
-  const handleBulkIncomplete = useCallback(() => {
-    if (selectedTodos.size > 0) {
-      bulkAction({ todoIds: Array.from(selectedTodos), action: 'incomplete' })
-      setSelectedTodos(new Set())
-    }
-  }, [selectedTodos, bulkAction])
-  
-  const handleBulkDelete = useCallback(() => {
-    if (selectedTodos.size > 0 && window.confirm(`Delete ${selectedTodos.size} selected todos?`)) {
-      bulkAction({ todoIds: Array.from(selectedTodos), action: 'delete' })
-      setSelectedTodos(new Set())
-    }
-  }, [selectedTodos, bulkAction])
-  
-  const handleDeleteCompleted = useCallback(() => {
-    const completedCount = todos.filter(t => t.completed).length
-    if (completedCount > 0 && window.confirm(`Delete all ${completedCount} completed todos?`)) {
-      deleteCompleted()
-    }
-  }, [todos, deleteCompleted])
-
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Focus search with Cmd/Ctrl + K
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        searchInputRef.current?.focus()
-      }
-      
-      // Filter shortcuts
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
-        switch (e.key) {
-          case 'A':
-            e.preventDefault()
-            setFilter('all')
-            break
-          case 'P':
-            e.preventDefault()
-            setFilter('pending')
-            break
-          case 'C':
-            e.preventDefault()
-            setFilter('completed')
-            break
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  // Initialize keyboard shortcuts
+  useDashboardKeyboard({ searchInputRef, setFilter })
 
   if (loading) {
     return (
@@ -314,14 +191,11 @@ export default function DashboardPage() {
             totalCount={filteredTodos.length}
             allSelected={selectedTodos.size === filteredTodos.length}
             isBulkAction={isBulkAction}
-            onSelectAll={handleSelectAll}
-            onBulkComplete={handleBulkComplete}
-            onBulkIncomplete={handleBulkIncomplete}
-            onBulkDelete={handleBulkDelete}
-            onCancel={() => {
-              setBulkSelectMode(false)
-              setSelectedTodos(new Set())
-            }}
+            onSelectAll={() => handleSelectAll(filteredTodos)}
+            onBulkComplete={() => handleBulkComplete(selectedTodos, clearSelection)}
+            onBulkIncomplete={() => handleBulkIncomplete(selectedTodos, clearSelection)}
+            onBulkDelete={() => handleBulkDelete(selectedTodos, clearSelection)}
+            onCancel={clearSelection}
           />
         )}
 
@@ -363,7 +237,7 @@ export default function DashboardPage() {
           onUpdateTodo={handleUpdateTodo}
           onDeleteTodo={handleDeleteTodo}
           onToggleShoppingItem={(todoId, itemId, completed) =>
-            toggleShoppingItem({ todoId, itemId, completed })
+            updateShoppingItem({ todoId, itemId, completed })
           }
           onSelectTodo={handleSelectTodo}
         />
@@ -371,5 +245,13 @@ export default function DashboardPage() {
       {(process.env.NODE_ENV === 'development' ||
         process.env.NEXT_PUBLIC_THEME_DEBUG === 'true') && <ThemeDebug />}
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <DashboardErrorBoundary>
+      <DashboardPageInternal />
+    </DashboardErrorBoundary>
   )
 }

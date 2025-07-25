@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Calendar as CalendarIcon } from 'lucide-react'
 import Link from 'next/link'
+import { CalendarErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
-export default function CalendarPage() {
+function CalendarPageInternal() {
   const { user } = useAuth()
-  const { todos, toggleTodo, updateTodo, deleteTodo, toggleShoppingItem } = useTodos()
+  const { todos, toggleTodo, updateTodo, deleteTodo, updateShoppingItem } = useTodos()
   const [selectedDate, setSelectedDate] = useState<Date>()
 
   // Filter tasks by selected date
@@ -98,7 +99,7 @@ export default function CalendarPage() {
                   onUpdateTodo={handleUpdateTodo}
                   onDeleteTodo={handleDeleteTodo}
                   onToggleShoppingItem={(todoId, itemId, completed) =>
-                    toggleShoppingItem({ todoId, itemId, completed })
+                    updateShoppingItem({ todoId, itemId, completed })
                   }
                   onSelectTodo={() => {}} // No bulk select in calendar view
                 />
@@ -125,5 +126,13 @@ export default function CalendarPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function CalendarPage() {
+  return (
+    <CalendarErrorBoundary>
+      <CalendarPageInternal />
+    </CalendarErrorBoundary>
   )
 }

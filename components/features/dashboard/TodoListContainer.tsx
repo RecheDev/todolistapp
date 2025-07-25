@@ -4,6 +4,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { TodoListSkeleton } from '@/components/features/todo/TodoSkeleton'
 import { EmptyState } from './EmptyState'
 import { VirtualList } from '@/components/ui/VirtualList'
+import { TodoErrorBoundary, VirtualListErrorBoundary } from '@/components/ui/feature-error-boundaries'
 import type { Todo } from '@/types/database'
 
 const TodoItem = lazy(() => import('@/components/features/todo/TodoItem').then(module => ({ default: module.TodoItem })))
@@ -72,22 +73,24 @@ export function TodoListContainer({
       className={shouldUseVirtualization ? "" : "animate-in fade-in slide-in-from-bottom-2 duration-300"}
       style={shouldUseVirtualization ? {} : { animationDelay: `${index * 50}ms` }}
     >
-      <Suspense fallback={<TodoListSkeleton count={1} />}>
-        <TodoItem
-          todo={todo}
-          onToggle={onToggleTodo}
-          onUpdate={onUpdateTodo}
-          onDelete={onDeleteTodo}
-          onToggleShoppingItem={onToggleShoppingItem}
-          isUpdating={isUpdating}
-          isDeleting={isDeleting}
-          isToggling={isToggling}
-          isDragging={isReordering}
-          bulkSelectMode={bulkSelectMode}
-          isSelected={selectedTodos.has(todo.id)}
-          onSelect={(selected) => onSelectTodo(todo.id, selected)}
-        />
-      </Suspense>
+      <TodoErrorBoundary>
+        <Suspense fallback={<TodoListSkeleton count={1} />}>
+          <TodoItem
+            todo={todo}
+            onToggle={onToggleTodo}
+            onUpdate={onUpdateTodo}
+            onDelete={onDeleteTodo}
+            onToggleShoppingItem={onToggleShoppingItem}
+            isUpdating={isUpdating}
+            isDeleting={isDeleting}
+            isToggling={isToggling}
+            isDragging={isReordering}
+            bulkSelectMode={bulkSelectMode}
+            isSelected={selectedTodos.has(todo.id)}
+            onSelect={(selected) => onSelectTodo(todo.id, selected)}
+          />
+        </Suspense>
+      </TodoErrorBoundary>
     </div>
   ), [
     shouldUseVirtualization,
@@ -116,14 +119,16 @@ export function TodoListContainer({
       ) : shouldUseVirtualization ? (
         /* Virtual List for large datasets */
         <div role="list" aria-label="Todo list">
-          <VirtualList
-            items={filteredTodos}
-            itemHeight={120} // Approximate height of a todo item
-            height={600} // Container height - adjust based on viewport
-            renderItem={renderTodoItem}
-            className="space-y-4"
-            overscan={10}
-          />
+          <VirtualListErrorBoundary>
+            <VirtualList
+              items={filteredTodos}
+              itemHeight={120} // Approximate height of a todo item
+              height={600} // Container height - adjust based on viewport
+              renderItem={renderTodoItem}
+              className="space-y-4"
+              overscan={10}
+            />
+          </VirtualListErrorBoundary>
         </div>
       ) : (
         /* Regular list with drag & drop for smaller datasets */

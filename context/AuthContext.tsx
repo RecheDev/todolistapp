@@ -18,7 +18,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Usuario demo predefinido
 const DEMO_USER: User = {
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsSigningOut(true)
     
     // Simulate network delay for sign out
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 150))
     
     setUser(null)
     safeLocalStorage.removeItem('demo-user')

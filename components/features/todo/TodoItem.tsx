@@ -151,7 +151,7 @@ export function TodoItem({
   const handleToggleWithProtection = useThrottleCallback((checked: boolean) => {
     if (isToggling) return // Prevent multiple toggle requests
     onToggle(todo.id, checked)
-  }, 300) // 300ms throttle
+  }, 150) // 150ms throttle
 
   const handleDeleteWithConfirmation = useCallback(() => {
     if (isDeleting) return // Prevent multiple delete requests

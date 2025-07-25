@@ -3,6 +3,7 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { AuthErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -26,5 +27,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  return <>{children}</>
+  return (
+    <AuthErrorBoundary>
+      {children}
+    </AuthErrorBoundary>
+  )
 }

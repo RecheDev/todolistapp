@@ -1,13 +1,8 @@
 import { Todo, ShoppingItem, CreateShoppingListInput, UpdateShoppingItemInput, BulkAction } from '@/types/database'
 import { safeLocalStorage } from '@/lib/storage'
 
-// Simular delay de red para una mejor UX - reduced for better INP
-const delay = (ms: number) => {
-  const shouldDelay = process.env.NEXT_PUBLIC_FAKE_DELAY
-  // Reduce delays significantly for better INP performance
-  const reducedMs = Math.min(ms, 50) // Cap at 50ms max
-  return shouldDelay ? new Promise(resolve => setTimeout(resolve, reducedMs)) : Promise.resolve()
-}
+// No delays for optimal UX
+const delay = (ms: number) => Promise.resolve()
 
 // Generar ID único
 const generateId = () => crypto.randomUUID()
@@ -37,7 +32,6 @@ const saveTodosToStorage = (todos: Todo[]) => {
 }
 
 export async function getTodos(userId: string): Promise<Todo[]> {
-  await delay(300) // Simular latencia de red
   const todos = getTodosFromStorage()
   return todos.filter(todo => todo.user_id === userId)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -50,7 +44,6 @@ export async function createTodo(
   priority: 'low' | 'medium' | 'high' = 'medium',
   due_date?: string
 ): Promise<Todo> {
-  await delay(400)
   
   const todos = getTodosFromStorage().filter(t => t.user_id === userId)
   const maxOrder = todos.length > 0 ? Math.max(...todos.map(t => t.order ?? 0)) : 0
@@ -79,7 +72,6 @@ export async function createTodo(
 export async function createShoppingList(
   input: CreateShoppingListInput
 ): Promise<Todo> {
-  await delay(400)
   
   const shoppingItems: ShoppingItem[] = input.shopping_items.map(text => ({
     id: generateId(),
@@ -114,7 +106,6 @@ export async function createShoppingList(
 export async function updateShoppingItem(
   input: UpdateShoppingItemInput
 ): Promise<Todo> {
-  await delay(300)
   
   const todos = getTodosFromStorage()
   const todoIndex = todos.findIndex(t => t.id === input.todoId)
@@ -151,7 +142,6 @@ export async function updateTodo(
   id: string,
   updates: Partial<Pick<Todo, 'title' | 'description' | 'completed' | 'priority' | 'due_date' | 'order'>>
 ): Promise<Todo> {
-  await delay(300)
   
   const todos = getTodosFromStorage()
   const todoIndex = todos.findIndex(todo => todo.id === id)
@@ -183,7 +173,6 @@ export async function toggleTodo(id: string, completed: boolean): Promise<Todo> 
 
 // New high-impact features
 export async function reorderTodos(userId: string, todoIds: string[]): Promise<Todo[]> {
-  await delay(200)
   
   const todos = getTodosFromStorage()
   const userTodos = todos.filter(t => t.user_id === userId)
@@ -203,7 +192,6 @@ export async function reorderTodos(userId: string, todoIds: string[]): Promise<T
 }
 
 export async function bulkAction(userId: string, todoIds: string[], action: BulkAction): Promise<Todo[]> {
-  await delay(300)
   
   const todos = getTodosFromStorage()
   const updatedTodos: Todo[] = []
@@ -232,7 +220,6 @@ export async function bulkAction(userId: string, todoIds: string[], action: Bulk
 }
 
 export async function deleteCompletedTodos(userId: string): Promise<void> {
-  await delay(300)
   
   const todos = getTodosFromStorage()
   const filteredTodos = todos.filter(todo => !(todo.user_id === userId && todo.completed))
@@ -243,7 +230,6 @@ export async function deleteCompletedTodos(userId: string): Promise<void> {
 let lastDeletedTodos: { todos: Todo[], timestamp: number } | null = null
 
 export async function deleteTodoWithUndo(id: string): Promise<{ todo: Todo }> {
-  await delay(300)
   
   const todos = getTodosFromStorage()
   const todoToDelete = todos.find(t => t.id === id)
@@ -266,7 +252,6 @@ export async function undoDelete(): Promise<Todo[]> {
     throw new Error('Nothing to undo or undo expired')
   }
   
-  await delay(200)
   
   const todos = getTodosFromStorage()
   const restoredTodos = [...todos, ...lastDeletedTodos.todos]
