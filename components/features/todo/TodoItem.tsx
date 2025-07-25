@@ -367,9 +367,13 @@ export function TodoItem({
                 >
                   {todo.title}
                 </h3>
-                {!isMinimized && todo.description && (
+                {todo.description && (
                   <p
-                    className={`text-base mt-2 break-words leading-relaxed font-normal ${
+                    className={`text-base mt-2 break-words leading-relaxed font-normal transition-opacity duration-200 ${
+                      isMinimized 
+                        ? 'opacity-40' 
+                        : 'opacity-100'
+                    } ${
                       todo.completed
                         ? 'text-tertiary line-through'
                         : 'text-secondary-foreground'
