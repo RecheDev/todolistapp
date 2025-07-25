@@ -46,7 +46,6 @@ function DashboardPageInternal() {
     isUpdating,
     isDeleting,
     isToggling,
-    isReordering,
     isBulkAction,
   } = useTodos()
 
@@ -63,7 +62,6 @@ function DashboardPageInternal() {
     handleToggleTodo,
     handleUpdateTodo,
     handleDeleteTodo,
-    handleDragEnd,
     handleBulkComplete,
     handleBulkIncomplete,
     handleBulkDelete,
@@ -226,13 +224,11 @@ function DashboardPageInternal() {
         <TodoListContainer
           filteredTodos={filteredTodos}
           allTodos={todos}
-          isReordering={isReordering}
           isUpdating={isUpdating}
           isDeleting={isDeleting}
           isToggling={isToggling}
           bulkSelectMode={bulkSelectMode}
           selectedTodos={selectedTodos}
-          onDragEnd={handleDragEnd}
           onToggleTodo={handleToggleTodo}
           onUpdateTodo={handleUpdateTodo}
           onDeleteTodo={handleDeleteTodo}

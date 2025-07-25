@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -29,6 +29,14 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
   const [dueDate, setDueDate] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof CreateTodoFormData, string>>>({})
+
+  // Detect OS for keyboard shortcut display
+  const isMac = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+  }, [])
+  
+  const modifierKey = isMac ? 'Cmd' : 'Ctrl'
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -193,7 +201,7 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               </p>
             )}
             <div id="title-help" className="sr-only">
-              Enter a title for your todo. Press Cmd+Enter or Ctrl+Enter to save, Escape to cancel.
+              Enter a title for your todo. Press {modifierKey}+Enter to save, Escape to cancel.
             </div>
           </div>
           <div className="space-y-2">
@@ -226,23 +234,23 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               </p>
             )}
             <div id="description-help" className="sr-only">
-              Optional description for your todo. Press Cmd+Enter or Ctrl+Enter to save, Escape to cancel.
+              Optional description for your todo. Press {modifierKey}+Enter to save, Escape to cancel.
             </div>
           </div>
           {todoType === 'shopping_list' && (
             <div className="space-y-2">
               <Textarea
-                placeholder="Shopping list items, write each item on a separate line:&#10;potatoes&#10;water&#10;milk&#10;bread"
+                placeholder="Enter each shopping item on a new line:&#10;&#10;🥔 Potatoes&#10;💧 Water&#10;🥛 Milk&#10;🍞 Bread"
                 value={shoppingItems}
                 onChange={(e) => setShoppingItems(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={isCreating}
-                rows={4}
+                rows={6}
                 aria-label="Shopping list items"
                 className="text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 resize-none focus:shadow-md"
               />
-              <div className="text-xs text-muted-foreground">
-                Write one item per line. Example: potatoes, water, milk
+              <div className="text-sm text-muted-foreground bg-muted/20 p-3 rounded-lg">
+                <strong>📝 How to add items:</strong> Write each item on a separate line. Press Enter after each item to create a new line. Each line will become a checkable item in your shopping list.
               </div>
             </div>
           )}

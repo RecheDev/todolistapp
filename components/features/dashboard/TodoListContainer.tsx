@@ -1,6 +1,4 @@
-import { Suspense, lazy, useState, useCallback } from 'react'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { Suspense, lazy, useCallback } from 'react'
 import { TodoListSkeleton } from '@/components/features/todo/TodoSkeleton'
 import { EmptyState } from './EmptyState'
 import { VirtualList } from '@/components/ui/VirtualList'
@@ -12,13 +10,11 @@ const TodoItem = lazy(() => import('@/components/features/todo/TodoItem').then(m
 interface TodoListContainerProps {
   filteredTodos: Todo[]
   allTodos: Todo[]
-  isReordering: boolean
   isUpdating: boolean
   isDeleting: boolean
   isToggling: boolean
   bulkSelectMode: boolean
   selectedTodos: Set<string>
-  onDragEnd: (event: DragEndEvent) => void
   onToggleTodo: (id: string, completed: boolean) => void
   onUpdateTodo: (id: string, updates: { title: string; description?: string }) => void
   onDeleteTodo: (id: string) => void
@@ -29,43 +25,19 @@ interface TodoListContainerProps {
 export function TodoListContainer({
   filteredTodos,
   allTodos,
-  isReordering,
   isUpdating,
   isDeleting,
   isToggling,
   bulkSelectMode,
   selectedTodos,
-  onDragEnd,
   onToggleTodo,
   onUpdateTodo,
   onDeleteTodo,
   onToggleShoppingItem,
   onSelectTodo,
 }: TodoListContainerProps) {
-  const [isDragging, setIsDragging] = useState(false)
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // Require 8px of movement before drag starts
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleDragStart = useCallback(() => {
-    setIsDragging(true)
-  }, [])
-
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setIsDragging(false)
-    onDragEnd(event)
-  }, [onDragEnd])
-
-  // Use virtualization for large lists when not dragging
-  const shouldUseVirtualization = filteredTodos.length > 50 && !isDragging && !bulkSelectMode
+  // Use virtualization for large lists
+  const shouldUseVirtualization = filteredTodos.length > 50 && !bulkSelectMode
 
   const renderTodoItem = useCallback((todo: Todo, index: number) => (
     <div
@@ -84,7 +56,6 @@ export function TodoListContainer({
             isUpdating={isUpdating}
             isDeleting={isDeleting}
             isToggling={isToggling}
-            isDragging={isReordering}
             bulkSelectMode={bulkSelectMode}
             isSelected={selectedTodos.has(todo.id)}
             onSelect={(selected) => onSelectTodo(todo.id, selected)}
@@ -101,7 +72,6 @@ export function TodoListContainer({
     isUpdating,
     isDeleting,
     isToggling,
-    isReordering,
     bulkSelectMode,
     selectedTodos,
     onSelectTodo,
@@ -131,22 +101,10 @@ export function TodoListContainer({
           </VirtualListErrorBoundary>
         </div>
       ) : (
-        /* Regular list with drag & drop for smaller datasets */
-        <DndContext 
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="space-y-4" role="list" aria-label="Todo list">
-            <SortableContext 
-              items={filteredTodos.map(todo => todo.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {filteredTodos.map((todo, index) => renderTodoItem(todo, index))}
-            </SortableContext>
-          </div>
-        </DndContext>
+        /* Regular list for smaller datasets */
+        <div className="space-y-4" role="list" aria-label="Todo list">
+          {filteredTodos.map((todo, index) => renderTodoItem(todo, index))}
+        </div>
       )}
     </>
   )

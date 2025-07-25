@@ -2,8 +2,6 @@
 
 import { useState, useCallback } from 'react'
 import { Todo } from '@/types/database'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { PriorityBadge } from '@/components/ui/priority-badge'
 import { DueDateBadge } from '@/components/ui/due-date-badge'
-import { MoreHorizontal, Edit, Trash2, Save, X, AlertCircle, Flag, Calendar, ChevronDown } from 'lucide-react'
+import { Edit, Trash2, Save, X, AlertCircle, Flag, Calendar, ChevronDown, ChevronUp } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { MdPriorityHigh, MdRemove, MdExpandMore } from 'react-icons/md'
 import { Spinner } from '@/components/ui/spinner'
@@ -31,7 +29,6 @@ interface TodoItemProps {
   isUpdating?: boolean
   isDeleting?: boolean
   isToggling?: boolean
-  isDragging?: boolean
   bulkSelectMode?: boolean
   isSelected?: boolean
   onSelect?: (selected: boolean) => void
@@ -46,24 +43,10 @@ export function TodoItem({
   isUpdating,
   isDeleting,
   isToggling,
-  isDragging,
   bulkSelectMode = false,
   isSelected = false,
   onSelect,
 }: TodoItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({ id: todo.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(todo.title)
   const [editDescription, setEditDescription] = useState(todo.description || '')
@@ -71,6 +54,7 @@ export function TodoItem({
   const [editDueDate, setEditDueDate] = useState(todo.due_date || '')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof UpdateTodoFormData, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
 
   const handleSave = useCallback(async () => {
     if (isSubmitting) return // Prevent multiple submissions
@@ -337,12 +321,8 @@ export function TodoItem({
 
   return (
     <Card 
-      ref={setNodeRef}
-      style={style}
       className={`w-full transition-all duration-200 hover:shadow-offset-lg hover:-translate-y-1 bg-background shadow-sm hover:shadow-md ${
         isDeleting ? 'opacity-50 scale-95' : ''
-      } ${
-        isSortableDragging || isDragging ? 'z-50 shadow-2xl scale-105 rotate-2' : ''
       }`}
     >
       <CardContent className="p-6">
@@ -387,7 +367,7 @@ export function TodoItem({
                 >
                   {todo.title}
                 </h3>
-                {todo.description && (
+                {!isMinimized && todo.description && (
                   <p
                     className={`text-base mt-2 break-words leading-relaxed font-normal ${
                       todo.completed
@@ -398,7 +378,7 @@ export function TodoItem({
                     {todo.description}
                   </p>
                 )}
-                {todo.type === 'shopping_list' && todo.shopping_items && (
+                {!isMinimized && todo.type === 'shopping_list' && todo.shopping_items && (
                   <div className="mt-4 space-y-3 bg-muted/10 p-4 rounded-lg shadow-inset">
                     <div className="text-sm font-semibold mb-3 text-secondary-foreground">Shopping items:</div>
                     {todo.shopping_items.map((item) => (
@@ -429,6 +409,16 @@ export function TodoItem({
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="h-10 w-10 p-0 hover:bg-accent transition-all duration-200 hover:scale-110"
+                  disabled={isDeleting || isToggling}
+                  aria-label={`${isMinimized ? 'Expand' : 'Minimize'} ${todo.title}`}
+                >
+                  {isMinimized ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsEditing(true)}
                   className="h-10 w-10 p-0 hover:bg-accent transition-all duration-200 hover:scale-110"
                   disabled={isDeleting || isToggling}
@@ -446,48 +436,37 @@ export function TodoItem({
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-10 w-10 p-0 hover:bg-accent transition-all duration-200 cursor-grab active:cursor-grabbing ${
-                    isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
-                  }`}
-                  disabled={isDeleting || isToggling}
-                  aria-label={`Drag to reorder ${todo.title}`}
-                  {...attributes}
-                  {...listeners}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-4 flex-wrap">
-              <Badge variant={todo.completed ? 'secondary' : 'default'} className="text-xs font-semibold px-3 py-1">
-                {todo.type === 'shopping_list' 
-                  ? (todo.completed ? '🛒 Complete' : '🛒 List')
-                  : (todo.completed ? '✅ Done' : '⏳ Pending')
-                }
-              </Badge>
-              
-              {/* Priority Badge */}
-              {todo.priority && (
-                <PriorityBadge priority={todo.priority} />
-              )}
-              
-              {/* Due Date Badge */}
-              {todo.due_date && (
-                <DueDateBadge dueDate={todo.due_date} completed={todo.completed} />
-              )}
-              
-              {todo.type === 'shopping_list' && todo.shopping_items && (
-                <span className="text-xs font-medium bg-muted/20 px-2 py-1 rounded text-tertiary">
-                  {todo.shopping_items.filter(item => item.completed).length}/{todo.shopping_items.length} items
+            {!isMinimized && (
+              <div className="flex items-center gap-2 mt-4 flex-wrap">
+                <Badge variant={todo.completed ? 'secondary' : 'default'} className="text-xs font-semibold px-3 py-1">
+                  {todo.type === 'shopping_list' 
+                    ? (todo.completed ? '🛒 Complete' : '🛒 List')
+                    : (todo.completed ? '✅ Done' : '⏳ Pending')
+                  }
+                </Badge>
+                
+                {/* Priority Badge */}
+                {todo.priority && (
+                  <PriorityBadge priority={todo.priority} />
+                )}
+                
+                {/* Due Date Badge */}
+                {todo.due_date && (
+                  <DueDateBadge dueDate={todo.due_date} completed={todo.completed} />
+                )}
+                
+                {todo.type === 'shopping_list' && todo.shopping_items && (
+                  <span className="text-xs font-medium bg-muted/20 px-2 py-1 rounded text-tertiary">
+                    {todo.shopping_items.filter(item => item.completed).length}/{todo.shopping_items.length} items
+                  </span>
+                )}
+                <span className="text-xs font-medium text-tertiary">
+                  {format(new Date(todo.created_at), 'dd/MM/yyyy')}
                 </span>
-              )}
-              <span className="text-xs font-medium text-tertiary">
-                {format(new Date(todo.created_at), 'dd/MM/yyyy')}
-              </span>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

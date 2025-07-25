@@ -88,13 +88,11 @@ function CalendarPageInternal() {
                 <TodoListContainer
                   filteredTodos={filteredTodos}
                   allTodos={todos}
-                  isReordering={false}
                   isUpdating={false}
                   isDeleting={false}
                   isToggling={false}
                   bulkSelectMode={false}
                   selectedTodos={new Set()}
-                  onDragEnd={() => {}} // No drag and drop in calendar view
                   onToggleTodo={handleToggleTodo}
                   onUpdateTodo={handleUpdateTodo}
                   onDeleteTodo={handleDeleteTodo}

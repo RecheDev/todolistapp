@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
@@ -38,13 +38,20 @@ const SearchAndFilterBarInternal = forwardRef<HTMLInputElement, SearchAndFilterB
     onToggleBulkMode,
     onDeleteCompleted,
   }, ref) => {
+    // Detect OS for keyboard shortcut display
+    const isMac = useMemo(() => {
+      if (typeof window === 'undefined') return false
+      return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+    }, [])
+    
+    const modifierKey = isMac ? 'Cmd' : 'Ctrl'
     return (
       <div className="flex flex-col gap-4 md:flex-row md:gap-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             ref={ref}
-            placeholder="Search tasks... (Cmd+K)"
+            placeholder={`Search tasks... (${modifierKey}+K)`}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 h-12 text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 rounded-lg shadow-input focus:shadow-md"
@@ -52,7 +59,7 @@ const SearchAndFilterBarInternal = forwardRef<HTMLInputElement, SearchAndFilterB
             aria-describedby="search-help"
           />
           <div id="search-help" className="sr-only">
-            Type to search through your todos by title or description. Press Cmd+K to focus search. Use Cmd+Shift+A for all, Cmd+Shift+P for pending, Cmd+Shift+C for completed.
+            Type to search through your todos by title or description. Press {modifierKey}+K to focus search. Use {modifierKey}+Shift+A for all, {modifierKey}+Shift+P for pending, {modifierKey}+Shift+C for completed.
           </div>
         </div>
         

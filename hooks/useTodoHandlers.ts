@@ -1,6 +1,4 @@
 import { useCallback } from 'react'
-import { DragEndEvent } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
 import type { Todo } from '@/types/database'
 
 interface UseTodoHandlersProps {
@@ -53,22 +51,6 @@ export function useTodoHandlers({
     deleteTodo(id)
   }, [deleteTodo])
   
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-    
-    if (!over || active.id === over.id) {
-      return
-    }
-    
-    const oldIndex = filteredTodos.findIndex(todo => todo.id === active.id)
-    const newIndex = filteredTodos.findIndex(todo => todo.id === over.id)
-    
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const reorderedTodos = arrayMove(filteredTodos, oldIndex, newIndex)
-      const todoIds = reorderedTodos.map(todo => todo.id)
-      reorderTodos(todoIds)
-    }
-  }, [filteredTodos, reorderTodos])
 
   const handleBulkComplete = useCallback((selectedTodos: Set<string>, clearSelection: () => void) => {
     if (selectedTodos.size > 0) {
@@ -104,7 +86,6 @@ export function useTodoHandlers({
     handleToggleTodo,
     handleUpdateTodo,
     handleDeleteTodo,
-    handleDragEnd,
     handleBulkComplete,
     handleBulkIncomplete,
     handleBulkDelete,
