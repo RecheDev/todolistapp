@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Todo } from '@/types/database'
+import { useWeather } from '@/hooks/useWeather'
+import { CalendarWeatherDisplay } from '@/components/features/weather/CalendarWeatherDisplay'
 
 interface CalendarProps {
   todos: Todo[]
@@ -22,6 +24,7 @@ const MONTHS = [
 
 export function Calendar({ todos, selectedDate, onDateSelect, onClose }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
+  const { weather } = useWeather()
 
   // Group tasks by date
   const todosByDate = useMemo(() => {
@@ -147,7 +150,7 @@ export function Calendar({ todos, selectedDate, onDateSelect, onClose }: Calenda
               key={index}
               onClick={() => onDateSelect(day.date)}
               className={cn(
-                "min-h-[80px] p-2 border-r border-b last:border-r-0 hover:bg-accent transition-colors",
+                "min-h-[100px] p-2 border-r border-b last:border-r-0 hover:bg-accent transition-colors",
                 "flex flex-col items-start justify-start text-left",
                 !day.isCurrentMonth && "text-muted-foreground bg-muted/20",
                 day.isToday && "bg-primary/10 border-primary/20",
@@ -163,8 +166,15 @@ export function Calendar({ todos, selectedDate, onDateSelect, onClose }: Calenda
                 {day.date.getDate()}
               </span>
               
+              <CalendarWeatherDisplay 
+                date={day.date} 
+                weather={weather} 
+                isSelected={day.isSelected}
+                compact={!day.isCurrentMonth}
+              />
+              
               {day.todos.length > 0 && (
-                <div className="flex flex-col gap-1 w-full">
+                <div className="flex flex-col gap-1 w-full mt-1">
                   {day.pendingTodos > 0 && (
                     <div className={cn(
                       "text-xs px-1 py-0.5 rounded",
