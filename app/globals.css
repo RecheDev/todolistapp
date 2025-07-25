@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@theme {
+  --radius: 0.75rem;
+  
+  /* TailwindCSS v4 utility mappings */
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(220 9% 12%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 9% 12%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(220 9% 12%);
+  --color-primary: hsl(221.2 83.2% 53.3%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-secondary: hsl(210 40% 96%);
+  --color-secondary-foreground: hsl(220 9% 12%);
+  --color-muted: hsl(210 40% 96%);
+  --color-muted-foreground: hsl(215.4 16.3% 40%);
+  --color-accent: hsl(210 40% 96%);
+  --color-accent-foreground: hsl(220 9% 12%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(221.2 83.2% 53.3%);
+}
+
+.dark {
+  --color-background: hsl(220 13% 9%);
+  --color-foreground: hsl(220 9% 92%);
+  --color-card: hsl(220 13% 11%);
+  --color-card-foreground: hsl(220 9% 92%);
+  --color-popover: hsl(220 13% 11%);
+  --color-popover-foreground: hsl(220 9% 92%);
+  --color-primary: hsl(210 100% 68%);
+  --color-primary-foreground: hsl(220 13% 9%);
+  --color-secondary: hsl(220 13% 14%);
+  --color-secondary-foreground: hsl(220 9% 92%);
+  --color-muted: hsl(220 13% 14%);
+  --color-muted-foreground: hsl(220 5% 65%);
+  --color-accent: hsl(220 13% 14%);
+  --color-accent-foreground: hsl(220 9% 92%);
+  --color-destructive: hsl(0 62.8% 58%);
+  --color-destructive-foreground: hsl(220 9% 92%);
+  --color-border: hsl(220 13% 18%);
+  --color-input: hsl(220 13% 14%);
+  --color-ring: hsl(210 100% 68%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  
+  /* Typography hierarchy */
+  h1 { font-size: 2rem; font-weight: 700; line-height: 1.3; }
+  h2 { font-size: 1.75rem; font-weight: 600; line-height: 1.3; }
+  h3 { font-size: 1.5rem; font-weight: 600; line-height: 1.4; }
+  
+  /* Theme transition disable */
+  .theme-transition-disable,
+  .theme-transition-disable *,
+  .theme-transition-disable *:before,
+  .theme-transition-disable *:after {
+    transition: none !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  
+  /* Shadow utilities with offset */
+  .shadow-offset {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .shadow-offset-lg {
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.06);
+  }
+  
+  .shadow-inset {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .shadow-input {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .accent-border-top {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Dark theme shadow adjustments */
+  .dark .shadow-offset {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dark .shadow-offset-lg {
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dark .shadow-input {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Improved focus indicators */
+  button:focus,
+  input:focus,
+  textarea:focus {
+    @apply outline-ring;
+    outline-width: 3px;
+    outline-offset: 2px;
+  }
+  
+  /* Better button accessibility */
+  button {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Success animations */
+  .animate-success {
+    animation: successPulse 0.6s ease-out;
+  }
+  
+  .animate-celebration {
+    animation: celebration 0.8s ease-out;
+  }
+  
+  .animate-check {
+    animation: checkmark 0.5s ease-out;
+  }
+}
+
+/* Keyframe animations for confirmation feedback */
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes celebration {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-5deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+  75% { transform: scale(1.1) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes checkmark {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
