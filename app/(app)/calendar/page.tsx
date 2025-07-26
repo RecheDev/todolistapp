@@ -13,7 +13,7 @@ import { CalendarErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 function CalendarPageInternal() {
   const { user } = useAuth()
-  const { todos, toggleTodo, updateTodo, deleteTodo, updateShoppingItem } = useTodos()
+  const { todos, toggleTodo, updateTodo, deleteTodo } = useTodos()
   const [selectedDate, setSelectedDate] = useState<Date>()
 
   // Filter tasks by selected date
@@ -62,7 +62,7 @@ function CalendarPageInternal() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-6 space-y-6">
+      <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 space-y-6 md:space-y-8">
         {/* Calendar */}
         <Calendar
           todos={todos}
@@ -96,13 +96,10 @@ function CalendarPageInternal() {
                   onToggleTodo={handleToggleTodo}
                   onUpdateTodo={handleUpdateTodo}
                   onDeleteTodo={handleDeleteTodo}
-                  onToggleShoppingItem={(todoId, itemId, completed) =>
-                    updateShoppingItem({ todoId, itemId, completed })
-                  }
                   onSelectTodo={() => {}} // No bulk select in calendar view
                 />
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-12 md:py-16 text-muted-foreground">
                   <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No tasks scheduled for this date</p>
                 </div>
@@ -113,7 +110,7 @@ function CalendarPageInternal() {
 
         {!selectedDate && (
           <Card>
-            <CardContent className="text-center py-12">
+            <CardContent className="text-center py-12 md:py-16">
               <CalendarIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
               <h2 className="text-xl font-semibold mb-2">Select a date</h2>
               <p className="text-muted-foreground">

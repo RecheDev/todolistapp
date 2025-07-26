@@ -12,16 +12,16 @@
   --color-popover-foreground: hsl(220 9% 12%);
   --color-primary: hsl(221.2 83.2% 53.3%);
   --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96%);
-  --color-secondary-foreground: hsl(220 9% 12%);
-  --color-muted: hsl(210 40% 96%);
-  --color-muted-foreground: hsl(215.4 16.3% 40%);
-  --color-accent: hsl(210 40% 96%);
-  --color-accent-foreground: hsl(220 9% 12%);
+  --color-secondary: hsl(210 40% 92%);
+  --color-secondary-foreground: hsl(220 9% 15%);
+  --color-muted: hsl(210 40% 92%);
+  --color-muted-foreground: hsl(215.4 16.3% 30%);
+  --color-accent: hsl(210 40% 92%);
+  --color-accent-foreground: hsl(220 9% 15%);
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(210 40% 98%);
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-border: hsl(214.3 31.8% 88%);
+  --color-input: hsl(214.3 31.8% 89%);
   --color-ring: hsl(221.2 83.2% 53.3%);
 }
 
@@ -120,6 +120,39 @@
   button {
     min-height: 48px;
     min-width: 48px;
+  }
+  
+  /* Mobile-first PWA spacing utilities */
+  .section-spacing {
+    margin-bottom: 1.5rem; /* 24px */
+  }
+  
+  @media (min-width: 640px) {
+    .section-spacing {
+      margin-bottom: 2rem; /* 32px */
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .section-spacing {
+      margin-bottom: 2.5rem; /* 40px */
+    }
+  }
+  
+  .section-padding {
+    padding: 1rem; /* 16px */
+  }
+  
+  @media (min-width: 640px) {
+    .section-padding {
+      padding: 1.5rem; /* 24px */
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .section-padding {
+      padding: 2rem; /* 32px */
+    }
   }
   
   /* Success animations */

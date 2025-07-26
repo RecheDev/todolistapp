@@ -67,8 +67,8 @@ function LoginFormInternal() {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6 pt-0">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-3">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -99,7 +99,7 @@ function LoginFormInternal() {
               </p>
             )}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"

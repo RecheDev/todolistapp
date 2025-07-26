@@ -30,7 +30,7 @@ export default function StatsPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-6">
+      <main className="container mx-auto px-4 py-6 md:px-6 md:py-8">
         <StatsBoard todos={todos} />
       </main>
     </div>

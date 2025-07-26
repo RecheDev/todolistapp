@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import { ErrorBoundary } from './error-boundary'
 import { toast } from 'sonner'
-import { RefreshCw, AlertTriangle, ShoppingCart, Plus, Search } from 'lucide-react'
+import { RefreshCw, AlertTriangle, Plus, Search } from 'lucide-react'
 import { Button } from './button'
 
 // Todo-specific error boundary
@@ -51,31 +51,6 @@ export function TodoErrorBoundary({ children }: { children: ReactNode }) {
   )
 }
 
-// Shopping list specific error boundary
-export function ShoppingListErrorBoundary({ children }: { children: ReactNode }) {
-  return (
-    <ErrorBoundary
-      name="Shopping List"
-      level="component"
-      onError={() => {
-        toast.error('Shopping list error. Please try again.', {
-          duration: 3000,
-          icon: <ShoppingCart className="h-4 w-4" />
-        })
-      }}
-      fallback={
-        <div className="border border-destructive/20 rounded-lg p-4 bg-destructive/5 text-center">
-          <ShoppingCart className="h-6 w-6 text-destructive mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">
-            Shopping list temporarily unavailable
-          </p>
-        </div>
-      }
-    >
-      {children}
-    </ErrorBoundary>
-  )
-}
 
 // Authentication error boundary
 export function AuthErrorBoundary({ children }: { children: ReactNode }) {

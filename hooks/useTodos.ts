@@ -5,7 +5,6 @@ export { useTodos } from './useTodosNew'
 export { 
   useTodoData, 
   useTodoMutations, 
-  useShoppingListMutations, 
   useTodoBulkOperations,
   useTodoQueryKey
 } from './useTodosNew'

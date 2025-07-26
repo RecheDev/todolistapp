@@ -57,9 +57,6 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
       return dueDate >= today && dueDate <= threeDaysFromNow
     }).length
 
-    // Type statistics
-    const regularTodos = todos.filter(t => t.type === 'todo').length
-    const shoppingLists = todos.filter(t => t.type === 'shopping_list').length
 
     // Recent statistics (last 7 days)
     const sevenDaysAgo = new Date()
@@ -83,8 +80,6 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
       withDueDate,
       overdue,
       dueSoon,
-      regularTodos,
-      shoppingLists,
       recentlyCreated,
       recentlyCompleted
     }
@@ -92,9 +87,9 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-600 dark:text-red-400'
-      case 'medium': return 'text-yellow-600 dark:text-yellow-400'
-      case 'low': return 'text-green-600 dark:text-green-400'
+      case 'high': return 'text-red-700 dark:text-red-400'
+      case 'medium': return 'text-yellow-700 dark:text-yellow-400'
+      case 'low': return 'text-green-700 dark:text-green-400'
       default: return 'text-muted-foreground'
     }
   }
@@ -109,7 +104,7 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -127,7 +122,7 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
       </div>
 
       {/* Main statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
@@ -136,7 +131,7 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.regularTodos} tasks, {stats.shoppingLists} lists
+              {stats.total} total tasks
             </p>
           </CardContent>
         </Card>
@@ -189,7 +184,7 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
             Overall Progress
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 md:space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Completed Tasks</span>
@@ -212,7 +207,7 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {(['high', 'medium', 'low'] as const).map((priority) => (
               <div key={priority} className={cn(
                 "p-4 rounded-lg border",
@@ -244,18 +239,18 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg border bg-blue-50 dark:bg-blue-900/20">
-              <div className="text-2xl font-bold text-blue-600">{stats.withDueDate}</div>
-              <div className="text-sm text-blue-800 dark:text-blue-200">With due date</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="p-4 rounded-lg border bg-blue-100 dark:bg-blue-900/20">
+              <div className="text-2xl font-bold text-blue-700">{stats.withDueDate}</div>
+              <div className="text-sm text-blue-900 dark:text-blue-200">With due date</div>
             </div>
-            <div className="p-4 rounded-lg border bg-orange-50 dark:bg-orange-900/20">
-              <div className="text-2xl font-bold text-orange-600">{stats.dueSoon}</div>
-              <div className="text-sm text-orange-800 dark:text-orange-200">Due soon</div>
+            <div className="p-4 rounded-lg border bg-orange-100 dark:bg-orange-900/20">
+              <div className="text-2xl font-bold text-orange-700">{stats.dueSoon}</div>
+              <div className="text-sm text-orange-900 dark:text-orange-200">Due soon</div>
             </div>
-            <div className="p-4 rounded-lg border bg-red-50 dark:bg-red-900/20">
-              <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
-              <div className="text-sm text-red-800 dark:text-red-200">Overdue</div>
+            <div className="p-4 rounded-lg border bg-red-100 dark:bg-red-900/20">
+              <div className="text-2xl font-bold text-red-700">{stats.overdue}</div>
+              <div className="text-sm text-red-900 dark:text-red-200">Overdue</div>
             </div>
           </div>
         </CardContent>
@@ -270,14 +265,14 @@ export function StatsBoard({ todos, onClose }: StatsBoardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg border bg-green-50 dark:bg-green-900/20">
-              <div className="text-2xl font-bold text-green-600">{stats.recentlyCreated}</div>
-              <div className="text-sm text-green-800 dark:text-green-200">Tasks created</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="p-4 rounded-lg border bg-green-100 dark:bg-green-900/20">
+              <div className="text-2xl font-bold text-green-700">{stats.recentlyCreated}</div>
+              <div className="text-sm text-green-900 dark:text-green-200">Tasks created</div>
             </div>
-            <div className="p-4 rounded-lg border bg-blue-50 dark:bg-blue-900/20">
-              <div className="text-2xl font-bold text-blue-600">{stats.recentlyCompleted}</div>
-              <div className="text-sm text-blue-800 dark:text-blue-200">Tasks completed</div>
+            <div className="p-4 rounded-lg border bg-blue-100 dark:bg-blue-900/20">
+              <div className="text-2xl font-bold text-blue-700">{stats.recentlyCompleted}</div>
+              <div className="text-sm text-blue-900 dark:text-blue-200">Tasks completed</div>
             </div>
           </div>
         </CardContent>

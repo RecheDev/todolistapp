@@ -34,11 +34,9 @@ function DashboardPageInternal() {
     loading,
     error,
     createTodo,
-    createShoppingList,
     updateTodo,
     deleteTodo,
     toggleTodo,
-    updateShoppingItem,
     reorderTodos,
     bulkAction,
     deleteCompleted,
@@ -105,7 +103,7 @@ function DashboardPageInternal() {
         </header>
 
         {/* Main Content Skeleton */}
-        <main className="px-4 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6 max-w-4xl mx-auto">
+        <main className="px-4 py-6 md:px-6 md:py-8 space-y-6 md:space-y-8 max-w-4xl mx-auto">
           {/* Search and Filter Skeleton */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 h-10 bg-muted rounded animate-pulse"></div>
@@ -146,7 +144,7 @@ function DashboardPageInternal() {
         </header>
 
         {/* Error Content */}
-        <main className="px-4 py-4 md:px-6 md:py-6 max-w-md mx-auto">
+        <main className="px-4 py-6 md:px-6 md:py-8 max-w-md mx-auto">
           <Card className="w-full max-w-md mx-auto">
             <CardHeader className="text-center">
               <CardTitle className="text-destructive flex items-center justify-center gap-3 text-2xl">
@@ -180,7 +178,7 @@ function DashboardPageInternal() {
         onLogout={handleLogout}
       />
 
-      <main className="container mx-auto px-6 py-6 space-y-6">
+      <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 space-y-6 md:space-y-8">
         <MobileStats stats={stats} isOnline={isOnline} />
 
         {(bulkSelectMode || selectedTodos.size > 0) && (
@@ -214,9 +212,6 @@ function DashboardPageInternal() {
         <Suspense fallback={<TodoListSkeleton count={1} />}>
           <AddTodo 
             onAdd={handleCreateTodo}
-            onAddShoppingList={(title, description, items) => 
-              createShoppingList({ title, description, items })
-            }
             isCreating={isCreating} 
           />
         </Suspense>
@@ -232,9 +227,6 @@ function DashboardPageInternal() {
           onToggleTodo={handleToggleTodo}
           onUpdateTodo={handleUpdateTodo}
           onDeleteTodo={handleDeleteTodo}
-          onToggleShoppingItem={(todoId, itemId, completed) =>
-            updateShoppingItem({ todoId, itemId, completed })
-          }
           onSelectTodo={handleSelectTodo}
         />
       </main>

@@ -21,5 +21,5 @@ export function useTodos() {
 
 // Re-export specialized hooks for direct use
 export { useTodoData } from './useTodoData'
-export { useTodoMutations, useShoppingListMutations, useTodoBulkOperations } from './useTodoMutations'
+export { useTodoMutations, useTodoBulkOperations } from './useTodoMutations'
 export { useTodoQueryKey } from './useTodoData'

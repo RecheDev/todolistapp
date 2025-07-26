@@ -18,7 +18,6 @@ interface TodoListContainerProps {
   onToggleTodo: (id: string, completed: boolean) => void
   onUpdateTodo: (id: string, updates: { title: string; description?: string }) => void
   onDeleteTodo: (id: string) => void
-  onToggleShoppingItem: (todoId: string, itemId: string, completed: boolean) => void
   onSelectTodo: (todoId: string, selected: boolean) => void
 }
 
@@ -33,7 +32,6 @@ export function TodoListContainer({
   onToggleTodo,
   onUpdateTodo,
   onDeleteTodo,
-  onToggleShoppingItem,
   onSelectTodo,
 }: TodoListContainerProps) {
   // Use virtualization for large lists
@@ -52,7 +50,6 @@ export function TodoListContainer({
             onToggle={onToggleTodo}
             onUpdate={onUpdateTodo}
             onDelete={onDeleteTodo}
-            onToggleShoppingItem={onToggleShoppingItem}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
             isToggling={isToggling}
@@ -68,7 +65,6 @@ export function TodoListContainer({
     onToggleTodo,
     onUpdateTodo,
     onDeleteTodo,
-    onToggleShoppingItem,
     isUpdating,
     isDeleting,
     isToggling,

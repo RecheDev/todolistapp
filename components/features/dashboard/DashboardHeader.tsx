@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { WeatherWidget } from '@/components/features/weather/WeatherWidget'
 import { LogOut, Calendar, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,7 +24,6 @@ export function DashboardHeader({ stats, isOnline, userEmail, onLogout }: Dashbo
             📋 My Tasks
           </h1>
           <div className="hidden sm:flex items-center gap-3">
-            <WeatherWidget />
             <Badge variant="outline" className="text-sm font-semibold px-3 py-1">{stats.total} total</Badge>
             <Badge variant="default" className="text-sm font-semibold px-3 py-1">{stats.pending} pending</Badge>
             <Badge variant="secondary" className="text-sm font-semibold px-3 py-1">{stats.completed} completed</Badge>

@@ -25,7 +25,6 @@ interface TodoItemProps {
   onToggle: (id: string, completed: boolean) => void
   onUpdate: (id: string, updates: { title: string; description?: string; priority?: 'low' | 'medium' | 'high'; due_date?: string }) => void
   onDelete: (id: string) => void
-  onToggleShoppingItem?: (todoId: string, itemId: string, completed: boolean) => void
   isUpdating?: boolean
   isDeleting?: boolean
   isToggling?: boolean
@@ -39,7 +38,6 @@ export function TodoItem({
   onToggle,
   onUpdate,
   onDelete,
-  onToggleShoppingItem,
   isUpdating,
   isDeleting,
   isToggling,
@@ -220,10 +218,9 @@ export function TodoItem({
           </div>
           
           {/* Priority and Due Date Section */}
-          {todo.type === 'todo' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Priority Selection */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="edit-priority" className="text-sm font-medium flex items-center gap-2">
                   <Flag className="h-4 w-4" />
                   Priority
@@ -273,7 +270,7 @@ export function TodoItem({
               </div>
               
               {/* Due Date Selection */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="edit-due-date" className="text-sm font-medium flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   Due date (optional)
@@ -289,7 +286,6 @@ export function TodoItem({
                 />
               </div>
             </div>
-          )}
           
           <div className="flex gap-3">
             <Button
@@ -382,32 +378,6 @@ export function TodoItem({
                     {todo.description}
                   </p>
                 )}
-                {!isMinimized && todo.type === 'shopping_list' && todo.shopping_items && (
-                  <div className="mt-4 space-y-3 bg-muted/10 p-4 rounded-lg shadow-inset">
-                    <div className="text-sm font-semibold mb-3 text-secondary-foreground">Shopping items:</div>
-                    {todo.shopping_items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4 p-2 rounded hover:bg-accent/50 transition-colors">
-                        <Checkbox
-                          checked={item.completed}
-                          onCheckedChange={(checked) => 
-                            onToggleShoppingItem?.(todo.id, item.id, checked as boolean)
-                          }
-                          className="h-6 w-6"
-                          aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
-                        />
-                        <span
-                          className={`text-sm leading-relaxed font-medium ${
-                            item.completed
-                              ? 'text-tertiary line-through'
-                              : 'text-primary'
-                            }`}
-                        >
-                          {item.text}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -445,10 +415,7 @@ export function TodoItem({
             {!isMinimized && (
               <div className="flex items-center gap-2 mt-4 flex-wrap">
                 <Badge variant={todo.completed ? 'secondary' : 'default'} className="text-xs font-semibold px-3 py-1">
-                  {todo.type === 'shopping_list' 
-                    ? (todo.completed ? '🛒 Complete' : '🛒 List')
-                    : (todo.completed ? '✅ Done' : '⏳ Pending')
-                  }
+                  {todo.completed ? '✅ Done' : '⏳ Pending'}
                 </Badge>
                 
                 {/* Priority Badge */}
@@ -461,11 +428,6 @@ export function TodoItem({
                   <DueDateBadge dueDate={todo.due_date} completed={todo.completed} />
                 )}
                 
-                {todo.type === 'shopping_list' && todo.shopping_items && (
-                  <span className="text-xs font-medium bg-muted/20 px-2 py-1 rounded text-tertiary">
-                    {todo.shopping_items.filter(item => item.completed).length}/{todo.shopping_items.length} items
-                  </span>
-                )}
                 <span className="text-xs font-medium text-tertiary">
                   {format(new Date(todo.created_at), 'dd/MM/yyyy')}
                 </span>

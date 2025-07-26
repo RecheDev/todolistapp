@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Todo } from '@/types/database'
-import { useWeather } from '@/hooks/useWeather'
-import { CalendarWeatherDisplay } from '@/components/features/weather/CalendarWeatherDisplay'
 
 interface CalendarProps {
   todos: Todo[]
@@ -16,7 +14,7 @@ interface CalendarProps {
   onClose?: () => void
 }
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
@@ -24,7 +22,6 @@ const MONTHS = [
 
 export function Calendar({ todos, selectedDate, onDateSelect, onClose }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const { weather } = useWeather()
 
   // Group tasks by date
   const todosByDate = useMemo(() => {
@@ -50,7 +47,10 @@ export function Calendar({ todos, selectedDate, onDateSelect, onClose }: Calenda
     
     const firstDay = new Date(year, month, 1)
     const startDate = new Date(firstDay)
-    startDate.setDate(startDate.getDate() - firstDay.getDay())
+    // Adjust to start week on Monday (0=Sunday, 1=Monday, etc.)
+    const dayOfWeek = firstDay.getDay()
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+    startDate.setDate(startDate.getDate() - daysFromMonday)
     
     const days = []
     const current = new Date(startDate)
@@ -165,13 +165,6 @@ export function Calendar({ todos, selectedDate, onDateSelect, onClose }: Calenda
               )}>
                 {day.date.getDate()}
               </span>
-              
-              <CalendarWeatherDisplay 
-                date={day.date} 
-                weather={weather} 
-                isSelected={day.isSelected}
-                compact={!day.isCurrentMonth}
-              />
               
               {day.todos.length > 0 && (
                 <div className="flex flex-col gap-1 w-full mt-1">

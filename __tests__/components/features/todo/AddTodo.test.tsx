@@ -22,7 +22,6 @@ const { validateWithSchema } = require('@/lib/validations')
 
 describe('AddTodo', () => {
   const mockOnAdd = jest.fn()
-  const mockOnAddShoppingList = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -58,23 +57,6 @@ describe('AddTodo', () => {
     expect(screen.getByText(/due date \(optional\)/i)).toBeInTheDocument()
   })
 
-  it('switches between todo and shopping list modes', async () => {
-    const user = userEvent.setup()
-    render(<AddTodo onAdd={mockOnAdd} onAddShoppingList={mockOnAddShoppingList} />)
-
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    // Initially should be in regular todo mode
-    expect(screen.getByText('Regular Task')).toBeInTheDocument()
-    expect(screen.getByText('A single thing to do')).toBeInTheDocument()
-
-    // Click shopping list option
-    const shoppingListButton = screen.getByRole('button', { name: /shopping list/i })
-    await user.click(shoppingListButton)
-
-    expect(screen.getByPlaceholderText(/shopping list name/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/shopping list items/i)).toBeInTheDocument()
-  })
 
   it('submits regular todo with valid data', async () => {
     const user = userEvent.setup()
@@ -100,32 +82,6 @@ describe('AddTodo', () => {
     expect(toast.success).toHaveBeenCalledWith('✅ Task created successfully!', { duration: 3000 })
   })
 
-  it('submits shopping list with valid data', async () => {
-    const user = userEvent.setup()
-    render(<AddTodo onAdd={mockOnAdd} onAddShoppingList={mockOnAddShoppingList} />)
-
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    // Switch to shopping list mode
-    await user.click(screen.getByRole('button', { name: /shopping list/i }))
-
-    // Fill in the form
-    const titleInput = screen.getByPlaceholderText(/shopping list name/i)
-    const itemsInput = screen.getByPlaceholderText(/shopping list items/i)
-
-    await user.type(titleInput, 'Grocery List')
-    await user.type(itemsInput, 'milk\nbread\neggs')
-
-    // Submit the form
-    const submitButton = screen.getByRole('button', { name: /create shopping list/i })
-    await user.click(submitButton)
-
-    await waitFor(() => {
-      expect(mockOnAddShoppingList).toHaveBeenCalledWith('Grocery List', '', ['milk', 'bread', 'eggs'])
-    })
-
-    expect(toast.success).toHaveBeenCalledWith('🛒 ¡Lista de compra creada exitosamente!', { duration: 3000 })
-  })
 
   it('shows validation errors', async () => {
     const user = userEvent.setup()
@@ -149,26 +105,6 @@ describe('AddTodo', () => {
     expect(mockOnAdd).not.toHaveBeenCalled()
   })
 
-  it('prevents submission of shopping list without items', async () => {
-    const user = userEvent.setup()
-    render(<AddTodo onAdd={mockOnAdd} onAddShoppingList={mockOnAddShoppingList} />)
-
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
-    await user.click(screen.getByRole('button', { name: /shopping list/i }))
-
-    // Fill only title, no items
-    const titleInput = screen.getByPlaceholderText(/shopping list name/i)
-    await user.type(titleInput, 'Empty List')
-
-    const submitButton = screen.getByRole('button', { name: /create shopping list/i })
-    await user.click(submitButton)
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Añade al menos un artículo a la lista de compra')
-    })
-
-    expect(mockOnAddShoppingList).not.toHaveBeenCalled()
-  })
 
   it('handles keyboard shortcuts', async () => {
     const user = userEvent.setup()

@@ -12,8 +12,6 @@ import {
   updateTodo,
   deleteTodoWithUndo,
   toggleTodo,
-  createShoppingList,
-  updateShoppingItem,
   reorderTodos,
   bulkAction,
   deleteCompletedTodos,
@@ -39,17 +37,6 @@ interface ToggleTodoVariables {
   completed: boolean
 }
 
-interface CreateShoppingListVariables {
-  title: string
-  description?: string
-  items: string[]
-}
-
-interface UpdateShoppingItemVariables {
-  todoId: string
-  itemId: string
-  completed: boolean
-}
 
 interface BulkActionVariables {
   todoIds: string[]
@@ -133,37 +120,6 @@ export function useTodoMutations() {
     }
   )
 
-  // Shopping list creation
-  const createShoppingListMutation = useSimpleMutation(
-    ({ title, description, items }: CreateShoppingListVariables) =>
-      createShoppingList({ title, description, shopping_items: items, user_id: user!.id }),
-    queryKey,
-    {
-      errorMessage: 'Failed to create shopping list',
-    }
-  )
-
-  // Shopping item update with optimistic updates
-  const updateShoppingItemMutation = useOptimisticMutation(
-    ({ todoId, itemId, completed }: UpdateShoppingItemVariables) =>
-      updateShoppingItem({ todoId, itemId, completed }),
-    queryKey,
-    ({ todoId, itemId, completed }, previousTodos) =>
-      previousTodos?.map((todo) => {
-        if (todo.id === todoId && todo.shopping_items) {
-          const updatedItems = todo.shopping_items.map(item =>
-            item.id === itemId ? { ...item, completed } : item
-          )
-          const allCompleted = updatedItems.every(item => item.completed)
-          return { ...todo, shopping_items: updatedItems, completed: allCompleted }
-        }
-        return todo
-      }) || [],
-    {
-      successToast: () => 'Item updated',
-      errorMessage: 'Failed to update item',
-    }
-  )
 
   // Reorder todos with optimistic updates
   const reorderMutation = useOptimisticMutation(
@@ -239,8 +195,6 @@ export function useTodoMutations() {
     updateTodo: updateMutation.mutate,
     deleteTodo: deleteMutation.mutate,
     toggleTodo: toggleMutation.mutate,
-    createShoppingList: createShoppingListMutation.mutate,
-    updateShoppingItem: updateShoppingItemMutation.mutate,
     reorderTodos: reorderMutation.mutate,
     // Wrapper for bulkAction to match expected interface
     bulkAction: (data: { todoIds: string[]; action: BulkAction }) => 
@@ -251,10 +205,10 @@ export function useTodoMutations() {
     undoDelete: () => undoDeleteMutation.mutate(undefined),
 
     // Loading states
-    isCreating: createMutation.isPending || createShoppingListMutation.isPending,
+    isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    isToggling: toggleMutation.isPending || updateShoppingItemMutation.isPending,
+    isToggling: toggleMutation.isPending,
     isReordering: reorderMutation.isPending,
     isBulkAction: bulkActionMutation.isPending || deleteCompletedMutation.isPending,
 
@@ -266,19 +220,6 @@ export function useTodoMutations() {
   }
 }
 
-/**
- * Specialized hook for shopping list mutations
- */
-export function useShoppingListMutations() {
-  const todoMutations = useTodoMutations()
-  
-  return {
-    createShoppingList: todoMutations.createShoppingList,
-    updateShoppingItem: todoMutations.updateShoppingItem,
-    isCreating: todoMutations.isCreating,
-    isUpdating: todoMutations.isUpdating,
-  }
-}
 
 /**
  * Specialized hook for bulk operations

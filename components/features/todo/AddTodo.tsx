@@ -7,8 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Plus, X, AlertCircle, Calendar, Flag, ChevronDown } from 'lucide-react'
-import { MdTask, MdShoppingCart, MdPriorityHigh, MdRemove, MdExpandMore } from 'react-icons/md'
+import { Plus, X, AlertCircle, Calendar, Flag, ChevronDown, Triangle, Minus, Circle } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { createTodoSchema, type CreateTodoFormData, validateWithSchema, sanitizeTodoInput } from '@/lib/validations'
 import { toast } from 'sonner'
@@ -16,16 +15,13 @@ import { AddTodoErrorBoundary } from '@/components/ui/feature-error-boundaries'
 
 interface AddTodoProps {
   onAdd: (title: string, description?: string, priority?: 'low' | 'medium' | 'high', dueDate?: string) => void
-  onAddShoppingList?: (title: string, description: string | undefined, items: string[]) => void
   isCreating?: boolean
 }
 
-function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps) {
+function AddTodoInternal({ onAdd, isCreating }: AddTodoProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [todoType, setTodoType] = useState<'todo' | 'shopping_list'>('todo')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [shoppingItems, setShoppingItems] = useState('')
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
   const [dueDate, setDueDate] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof CreateTodoFormData, string>>>({})
@@ -33,7 +29,7 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
   // Detect OS for keyboard shortcut display
   const isMac = useMemo(() => {
     if (typeof window === 'undefined') return false
-    return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+    return /Mac|iPod|iPhone|iPad/.test(window.navigator.userAgent)
   }, [])
   
   const modifierKey = isMac ? 'Cmd' : 'Ctrl'
@@ -58,28 +54,12 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
     // Sanitize input before sending
     const sanitizedData = sanitizeTodoInput(validation.data)
     
-    if (todoType === 'shopping_list') {
-      const items = shoppingItems
-        .split('\n')
-        .map(item => item.trim())
-        .filter(item => item.length > 0)
-      
-      if (items.length === 0) {
-        toast.error('Añade al menos un artículo a la lista de compra')
-        return
-      }
-      
-      onAddShoppingList?.(sanitizedData.title, sanitizedData.description, items)
-      toast.success('🛒 ¡Lista de compra creada exitosamente!', { duration: 3000 })
-    } else {
-      onAdd(sanitizedData.title, sanitizedData.description, priority, dueDate || undefined)
-      toast.success('✅ Task created successfully!', { duration: 3000 })
-    }
+    onAdd(sanitizedData.title, sanitizedData.description, priority, dueDate || undefined)
+    toast.success('✅ Task created successfully!', { duration: 3000 })
     
     // Reset form
     setTitle('')
     setDescription('')
-    setShoppingItems('')
     setPriority('medium')
     setDueDate('')
     setFieldErrors({})
@@ -89,10 +69,8 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
   const handleCancel = () => {
     setTitle('')
     setDescription('')
-    setShoppingItems('')
     setPriority('medium')
     setDueDate('')
-    setTodoType('todo')
     setFieldErrors({})
     setIsExpanded(false)
   }
@@ -128,51 +106,13 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
       </CardHeader>
       <CardContent className="space-y-6 p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-6" role="form" aria-label="Add new todo form">
-          {/* Type selector */}
-          <div className="space-y-4">
-            <label className="text-lg font-semibold text-primary">What would you like to create?</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setTodoType('todo')}
-                className={`h-20 p-6 text-left transition-all duration-300 transform hover:scale-[1.02] rounded-lg ${
-                  todoType === 'todo'
-                    ? 'bg-primary text-primary-foreground shadow-offset-lg scale-[1.02]'
-                    : 'bg-background/50 hover:bg-accent/70 shadow-input hover:shadow-offset'
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <MdTask className="text-3xl" />
-                  <div>
-                    <div className="text-lg font-bold">Regular Task</div>
-                    <div className="text-sm opacity-80">A single thing to do</div>
-                  </div>
-                </div>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setTodoType('shopping_list')}
-                className={`h-20 p-6 text-left transition-all duration-300 transform hover:scale-[1.02] rounded-lg ${
-                  todoType === 'shopping_list'
-                    ? 'bg-primary text-primary-foreground shadow-offset-lg scale-[1.02]'
-                    : 'bg-background/50 hover:bg-accent/70 shadow-input hover:shadow-offset'
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <MdShoppingCart className="text-3xl" />
-                  <div>
-                    <div className="text-lg font-bold">Shopping List</div>
-                    <div className="text-sm opacity-80">Multiple items to buy</div>
-                  </div>
-                </div>
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
+            <Label htmlFor="todo-title" className="text-base font-semibold text-primary">
+              What do you need to do?
+            </Label>
             <Input
-              placeholder={todoType === 'shopping_list' ? 'Shopping list name...' : 'What do you need to do?'}
+              id="todo-title"
+              placeholder="e.g., Call dentist, Finish project report, Buy groceries..."
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value)
@@ -187,10 +127,10 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               required
               aria-label="Todo title"
               aria-describedby={fieldErrors.title ? "title-error" : "title-help"}
-              className={`h-16 text-lg transition-all duration-200 border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md ${
+              className={`h-20 text-xl px-6 py-4 font-medium transition-all duration-200 border-2 bg-gradient-to-r from-background to-muted/30 focus:from-primary/5 focus:to-primary/10 focus:bg-background focus:shadow-lg focus:border-primary/50 hover:border-primary/30 rounded-xl ${
                 fieldErrors.title 
-                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
-                  : ''
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20 border-red-300 dark:border-red-700' 
+                  : 'border-border/60'
               }`}
               aria-invalid={fieldErrors.title ? "true" : "false"}
             />
@@ -204,9 +144,13 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               Enter a title for your todo. Press {modifierKey}+Enter to save, Escape to cancel.
             </div>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
+            <Label htmlFor="todo-description" className="text-base font-medium text-foreground">
+              Description (optional)
+            </Label>
             <Textarea
-              placeholder="Description (optional)"
+              id="todo-description"
+              placeholder="Add more details about this task..."
               value={description}
               onChange={(e) => {
                 setDescription(e.target.value)
@@ -220,10 +164,10 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               rows={3}
               aria-label="Todo description (optional)"
               aria-describedby={fieldErrors.description ? "description-error" : "description-help"}
-              className={`text-base transition-all duration-200 resize-none border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md ${
+              className={`text-base px-4 py-3 transition-all duration-200 resize-none border-2 bg-gradient-to-r from-background to-muted/30 focus:from-primary/5 focus:to-primary/10 focus:bg-background focus:shadow-md focus:border-primary/50 hover:border-primary/30 rounded-lg ${
                 fieldErrors.description 
-                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20' 
-                  : ''
+                  ? 'bg-red-50 focus:bg-red-100 dark:bg-red-900/10 dark:focus:bg-red-900/20 border-red-300 dark:border-red-700' 
+                  : 'border-border/60'
               }`}
               aria-invalid={fieldErrors.description ? "true" : "false"}
             />
@@ -237,123 +181,98 @@ function AddTodoInternal({ onAdd, onAddShoppingList, isCreating }: AddTodoProps)
               Optional description for your todo. Press {modifierKey}+Enter to save, Escape to cancel.
             </div>
           </div>
-          {todoType === 'shopping_list' && (
-            <div className="space-y-2">
-              <Textarea
-                placeholder="Enter each shopping item on a new line:&#10;&#10;🥔 Potatoes&#10;💧 Water&#10;🥛 Milk&#10;🍞 Bread"
-                value={shoppingItems}
-                onChange={(e) => setShoppingItems(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isCreating}
-                rows={6}
-                aria-label="Shopping list items"
-                className="text-base border-0 bg-muted/30 focus:bg-muted/50 transition-all duration-200 resize-none focus:shadow-md"
-              />
-              <div className="text-sm text-muted-foreground bg-muted/20 p-3 rounded-lg">
-                <strong>📝 How to add items:</strong> Write each item on a separate line. Press Enter after each item to create a new line. Each line will become a checkable item in your shopping list.
-              </div>
-            </div>
-          )}
           
-          {todoType === 'todo' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Priority Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="priority" className="text-sm font-medium flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
-                  Priority
-                </Label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      id="priority"
-                      className="w-full h-12 justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        {priority === 'high' ? (
-                          <MdPriorityHigh className="h-4 w-4 text-red-600" />
-                        ) : priority === 'medium' ? (
-                          <MdRemove className="h-4 w-4 text-blue-600" />
-                        ) : (
-                          <MdExpandMore className="h-4 w-4 text-gray-600" />
-                        )}
-                        <span>{priority === 'high' ? 'High Priority' : priority === 'medium' ? 'Medium Priority' : 'Low Priority'}</span>
-                      </div>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-full" align="start">
-                    <DropdownMenuItem onClick={() => setPriority('high')} className="cursor-pointer p-3">
-                      <div className="flex items-center gap-2">
-                        <MdPriorityHigh className="h-4 w-4 text-red-600" />
-                        <span>High Priority</span>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setPriority('medium')} className="cursor-pointer p-3">
-                      <div className="flex items-center gap-2">
-                        <MdRemove className="h-4 w-4 text-blue-600" />
-                        <span>Medium Priority</span>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setPriority('low')} className="cursor-pointer p-3">
-                      <div className="flex items-center gap-2">
-                        <MdExpandMore className="h-4 w-4 text-gray-600" />
-                        <span>Low Priority</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              
-              {/* Due Date Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="due-date" className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Due Date (optional)
-                </Label>
-                <Input
-                  id="due-date"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  disabled={isCreating}
-                  className="h-12 border-0 bg-muted/30 focus:bg-muted/50 focus:shadow-md"
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Priority Selection */}
+            <div className="space-y-3">
+              <Label htmlFor="priority" className="text-base font-medium flex items-center gap-2">
+                <Flag className="h-4 w-4" />
+                Priority
+              </Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    id="priority"
+                    className="w-full h-14 justify-between text-base border-2 border-border/60 hover:border-primary/30 focus:border-primary/50 bg-gradient-to-r from-background to-muted/30 hover:from-primary/5 hover:to-primary/10 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      {priority === 'high' ? (
+                        <Triangle className="h-5 w-5 text-red-600 fill-red-600" />
+                      ) : priority === 'medium' ? (
+                        <Minus className="h-5 w-5 text-blue-600" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-gray-600" />
+                      )}
+                      <span className="font-medium">{priority === 'high' ? 'High Priority' : priority === 'medium' ? 'Medium Priority' : 'Low Priority'}</span>
+                    </div>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full" align="start">
+                  <DropdownMenuItem onClick={() => setPriority('high')} className="cursor-pointer p-3">
+                    <div className="flex items-center gap-2">
+                      <Triangle className="h-4 w-4 text-red-600 fill-red-600" />
+                      <span>High Priority</span>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setPriority('medium')} className="cursor-pointer p-3">
+                    <div className="flex items-center gap-2">
+                      <Minus className="h-4 w-4 text-blue-600" />
+                      <span>Medium Priority</span>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setPriority('low')} className="cursor-pointer p-3">
+                    <div className="flex items-center gap-2">
+                      <Circle className="h-4 w-4 text-gray-600" />
+                      <span>Low Priority</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          )}
-          <div className="flex gap-4">
+            
+            {/* Due Date Selection */}
+            <div className="space-y-3">
+              <Label htmlFor="due-date" className="text-base font-medium flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Due Date (optional)
+              </Label>
+              <Input
+                id="due-date"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                disabled={isCreating}
+                className="h-14 text-base px-4 border-2 border-border/60 bg-gradient-to-r from-background to-muted/30 focus:from-primary/5 focus:to-primary/10 focus:bg-background focus:shadow-md focus:border-primary/50 hover:border-primary/30 rounded-lg"
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+          </div>
+          
+          <div className="flex gap-4 pt-2">
             <Button
               type="submit"
               disabled={!title.trim() || isCreating}
-              className="flex-1 h-12 text-base"
+              className="flex-1 h-14 text-base font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
               size="lg"
             >
               {isCreating ? (
-                <Spinner size="sm" className="mr-2" />
-              ) : todoType === 'shopping_list' ? (
-                <MdShoppingCart className="h-4 w-4 mr-2" />
+                <Spinner size="sm" className="mr-3" />
               ) : (
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-5 w-5 mr-3" />
               )}
-              {isCreating 
-                ? 'Creating...' 
-                : todoType === 'shopping_list' 
-                  ? 'Create Shopping List' 
-                  : 'Create Task'
-              }
+              {isCreating ? 'Creating...' : 'Create Task'}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
               disabled={isCreating}
-              className="h-12 px-4"
+              className="h-14 px-6 border-2 border-border/60 hover:border-primary/30 rounded-lg"
               size="lg"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
           </div>
         </form>

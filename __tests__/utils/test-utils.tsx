@@ -41,22 +41,6 @@ export const mockTodos: Todo[] = [
     updated_at: new Date().toISOString(),
     order: 1,
   },
-  {
-    id: '3',
-    title: 'Shopping List',
-    description: 'Weekly groceries',
-    completed: false,
-    priority: 'low',
-    due_date: null,
-    user_id: 'test-user-id',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    order: 2,
-    shopping_items: [
-      { id: 'item-1', text: 'Milk', completed: false },
-      { id: 'item-2', text: 'Bread', completed: true },
-    ],
-  },
 ]
 
 // Mock auth context values
