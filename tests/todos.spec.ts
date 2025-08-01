@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test'
 
 // Mock authentication helper using demo credentials
 async function mockLogin(page: Page) {
-  // Use the demo credentials from CLAUDE.md
+  // Use the hardcoded demo credentials from README.md
   await page.goto('/login')
   await page.getByLabel('Email').fill('demo@todoapp.com')
   await page.getByLabel('Password').fill('demo123')
