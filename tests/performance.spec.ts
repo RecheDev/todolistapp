@@ -16,14 +16,14 @@ test.describe('Performance Tests - Action Response Times', () => {
     await page.click('button:has-text("Add New Task")')
     
     // Wait for form to appear
-    await page.waitForSelector('input[placeholder*="título"]')
+    await page.waitForSelector('input[placeholder*="e.g."]')
     const formAppearTime = Date.now() - startTime
     
     expect(formAppearTime).toBeLessThan(200)
     console.log(`Add task button response time: ${formAppearTime}ms`)
     
     // Fill form and submit
-    await page.fill('input[placeholder*="título"]', 'Performance Test Task')
+    await page.fill('input[placeholder*="e.g."]', 'Performance Test Task')
     
     const submitStartTime = Date.now()
     await page.click('button:has-text("Create Task")')
@@ -39,7 +39,7 @@ test.describe('Performance Tests - Action Response Times', () => {
   test('Toggle task completion should complete under 200ms', async ({ page }) => {
     // First create a task
     await page.click('button:has-text("Add New Task")')
-    await page.fill('input[placeholder*="título"]', 'Toggle Test Task')
+    await page.fill('input[placeholder*="e.g."]', 'Toggle Test Task')
     await page.click('button:has-text("Create Task")')
     await page.waitForSelector('text=Toggle Test Task')
     
@@ -60,7 +60,7 @@ test.describe('Performance Tests - Action Response Times', () => {
   test('Delete task action should complete under 200ms', async ({ page }) => {
     // First create a task
     await page.click('button:has-text("Add New Task")')
-    await page.fill('input[placeholder*="título"]', 'Delete Test Task')
+    await page.fill('input[placeholder*="e.g."]', 'Delete Test Task')
     await page.click('button:has-text("Create Task")')
     await page.waitForSelector('text=Delete Test Task')
     
@@ -85,7 +85,7 @@ test.describe('Performance Tests - Action Response Times', () => {
   test('Edit task action should complete under 200ms', async ({ page }) => {
     // First create a task
     await page.click('button:has-text("Add New Task")')
-    await page.fill('input[placeholder*="título"]', 'Edit Test Task')
+    await page.fill('input[placeholder*="e.g."]', 'Edit Test Task')
     await page.click('button:has-text("Create Task")')
     await page.waitForSelector('text=Edit Test Task')
     
@@ -122,7 +122,7 @@ test.describe('Performance Tests - Action Response Times', () => {
     
     for (const task of tasks) {
       await page.click('button:has-text("Add New Task")')
-      await page.fill('input[placeholder*="título"]', task)
+      await page.fill('input[placeholder*="e.g."]', task)
       await page.click('button:has-text("Create Task")')
       await page.waitForSelector(`text=${task}`)
     }
