@@ -149,18 +149,18 @@ function DashboardPageInternal() {
             <CardHeader className="text-center">
               <CardTitle className="text-destructive flex items-center justify-center gap-3 text-2xl">
                 <span className="text-4xl">⚠️</span>
-                Algo salió mal
+                Something went wrong
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-xl text-muted-foreground leading-relaxed">
-                {error instanceof Error ? error.message : 'No se pudieron cargar tus tareas'}
+                {error instanceof Error ? error.message : 'Could not load your tasks'}
               </p>
               <Button 
                 onClick={() => window.location.reload()} 
                 className="w-full h-16 text-xl font-bold bg-primary hover:bg-primary/80 active:bg-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                🔄 Intentar de nuevo
+                🔄 Try again
               </Button>
             </CardContent>
           </Card>

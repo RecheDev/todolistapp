@@ -20,14 +20,14 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Usuario demo predefinido
+// Predefined demo user
 const DEMO_USER: User = {
   id: 'demo-user-001',
   email: 'demo@todoapp.com',
-  name: 'Usuario Demo'
+  name: 'Demo User'
 }
 
-// Credenciales demo
+// Demo credentials
 const DEMO_CREDENTIALS = {
   email: 'demo@todoapp.com',
   password: 'demo123'
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   useEffect(() => {
-    // Simular carga inicial y verificar si hay sesión guardada
+    // Simulate initial load and check for saved session
     const checkSession = () => {
       const savedUser = safeLocalStorage.getItem<User>('demo-user')
       if (savedUser) {
@@ -56,23 +56,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     setLoading(true)
     
-    // Simular un pequeño delay para la UX
+    // Simulate a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 800))
     
-    // Verificar credenciales demo
+    // Verify demo credentials
     if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
       setUser(DEMO_USER)
       safeLocalStorage.setItem('demo-user', DEMO_USER)
       setLoading(false)
     } else {
       setLoading(false)
-      throw new Error('Credenciales inválidas. Usa: demo@todoapp.com / demo123')
+      throw new Error('Invalid credentials. Use: demo@todoapp.com / demo123')
     }
   }
 
   const signUp = async (email: string, password: string) => {
-    // Para el registro, simplemente dirigir al usuario a usar las credenciales demo
-    throw new Error('Para este demo, usa las credenciales: demo@todoapp.com / demo123')
+    // For sign up, simply direct the user to use the demo credentials
+    throw new Error('For this demo, use the credentials: demo@todoapp.com / demo123')
   }
 
   const signOut = async () => {
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     setUser(null)
     safeLocalStorage.removeItem('demo-user')
-    // También limpiar cualquier data de todos
+    // Also clear any todo data
     safeLocalStorage.removeItem('demo-todos')
     
     setIsSigningOut(false)
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

@@ -43,11 +43,11 @@ function AddTodoInternal({ onAdd, isCreating }: AddTodoProps) {
     if (!validation.success) {
       const errors: Partial<Record<keyof CreateTodoFormData, string>> = {}
       validation.errors.forEach(error => {
-        if (error.includes('título')) errors.title = error
-        if (error.includes('descripción')) errors.description = error
+        if (error.toLowerCase().includes('title')) errors.title = error
+        if (error.toLowerCase().includes('description')) errors.description = error
       })
       setFieldErrors(errors)
-      toast.error('⚠️ Por favor corrige los errores en el formulario', { duration: 4000 })
+      toast.error('⚠️ Please correct the errors in the form', { duration: 4000 })
       return
     }
 

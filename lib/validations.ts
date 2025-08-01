@@ -4,14 +4,14 @@ import { z } from 'zod'
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, 'El email es requerido')
-    .email('Formato de email inválido')
-    .max(100, 'El email es demasiado largo'),
+    .min(1, 'Email is required')
+    .email('Invalid email format')
+    .max(100, 'Email is too long'),
   password: z
     .string()
-    .min(1, 'La contraseña es requerida')
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
-    .max(50, 'La contraseña es demasiado larga'),
+    .min(1, 'Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .max(50, 'Password is too long'),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
@@ -20,12 +20,12 @@ export type LoginFormData = z.infer<typeof loginSchema>
 export const createTodoSchema = z.object({
   title: z
     .string()
-    .min(1, 'El título es requerido')
-    .max(100, 'El título no puede exceder 100 caracteres')
+    .min(1, 'Title is required')
+    .max(100, 'Title cannot exceed 100 characters')
     .trim(),
   description: z
     .string()
-    .max(500, 'La descripción no puede exceder 500 caracteres')
+    .max(500, 'Description cannot exceed 500 characters')
     .trim()
     .optional()
     .or(z.literal('')),
@@ -34,12 +34,12 @@ export const createTodoSchema = z.object({
 export const updateTodoSchema = z.object({
   title: z
     .string()
-    .min(1, 'El título es requerido')
-    .max(100, 'El título no puede exceder 100 caracteres')
+    .min(1, 'Title is required')
+    .max(100, 'Title cannot exceed 100 characters')
     .trim(),
   description: z
     .string()
-    .max(500, 'La descripción no puede exceder 500 caracteres')
+    .max(500, 'Description cannot exceed 500 characters')
     .trim()
     .optional()
     .or(z.literal('')),
@@ -52,7 +52,7 @@ export type UpdateTodoFormData = z.infer<typeof updateTodoSchema>
 export const searchSchema = z.object({
   query: z
     .string()
-    .max(100, 'La búsqueda es demasiado larga')
+    .max(100, 'Search query is too long')
     .trim(),
 })
 
@@ -73,7 +73,7 @@ export function validateWithSchema<T>(
   } catch {
     return { 
       success: false, 
-      errors: ['Error de validación inesperado'] 
+      errors: ['Unexpected validation error']
     }
   }
 }

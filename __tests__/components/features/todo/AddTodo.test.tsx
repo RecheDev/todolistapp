@@ -87,7 +87,7 @@ describe('AddTodo', () => {
     const user = userEvent.setup()
     validateWithSchema.mockReturnValue({
       success: false,
-      errors: ['El título es requerido', 'La descripción es muy larga']
+      errors: ['Title is required', 'Description is too long']
     })
 
     render(<AddTodo onAdd={mockOnAdd} />)
@@ -99,7 +99,7 @@ describe('AddTodo', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('⚠️ Por favor corrige los errores en el formulario', { duration: 4000 })
+      expect(toast.error).toHaveBeenCalledWith('⚠️ Please correct the errors in the form', { duration: 4000 })
     })
 
     expect(mockOnAdd).not.toHaveBeenCalled()
@@ -192,7 +192,7 @@ describe('AddTodo', () => {
     const user = userEvent.setup()
     validateWithSchema.mockReturnValueOnce({
       success: false,
-      errors: ['El título es requerido']
+      errors: ['Title is required']
     }).mockReturnValue({
       success: true,
       data: { title: 'Valid Title', description: '' }
