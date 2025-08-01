@@ -22,3 +22,4 @@ export function ThemeScript() {
 
   return <script dangerouslySetInnerHTML={{ __html: script }} />;
 }
+
