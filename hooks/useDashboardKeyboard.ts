@@ -39,3 +39,4 @@ export function useDashboardKeyboard({ searchInputRef, setFilter }: UseDashboard
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [searchInputRef, setFilter])
 }
+
