@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { SenseiLogoWithText } from '@/components/ui/logo'
 import { LogOut, Calendar, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -20,9 +21,7 @@ export function DashboardHeader({ stats, isOnline, userEmail, onLogout }: Dashbo
     <header className="sticky top-0 z-50 w-full border-b-2 border-border bg-background/80 backdrop-blur-lg accent-border-top">
       <div className="px-6 flex h-20 items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-primary">
-            📋 My Tasks
-          </h1>
+          <SenseiLogoWithText size="sm" />
           <div className="hidden sm:flex items-center gap-3">
             <Badge variant="outline" className="text-sm font-semibold px-3 py-1">{stats.total} total</Badge>
             <Badge variant="default" className="text-sm font-semibold px-3 py-1">{stats.pending} pending</Badge>

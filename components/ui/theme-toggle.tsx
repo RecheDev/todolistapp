@@ -14,7 +14,11 @@ export function ThemeToggle() {
         variant={actualTheme === 'light' ? 'default' : 'ghost'}
         size="sm"
         onClick={() => setTheme('light')}
-        className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
+        className={`h-10 w-10 p-0 transition-all duration-200 ${
+          actualTheme === 'light' 
+            ? 'hover:bg-primary/80 hover:text-primary-foreground' 
+            : 'hover:bg-accent/50'
+        }`}
         aria-label="Switch to light mode"
         aria-pressed={actualTheme === 'light'}
       >
@@ -27,7 +31,11 @@ export function ThemeToggle() {
         variant={actualTheme === 'dark' ? 'default' : 'ghost'}
         size="sm"
         onClick={() => setTheme('dark')}
-        className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
+        className={`h-10 w-10 p-0 transition-all duration-200 ${
+          actualTheme === 'dark' 
+            ? 'hover:bg-primary/80 hover:text-primary-foreground' 
+            : 'hover:bg-accent/50'
+        }`}
         aria-label="Switch to dark mode"
         aria-pressed={actualTheme === 'dark'}
       >
@@ -50,7 +58,7 @@ export function SimpleThemeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleTheme}
-      className="h-10 w-10 p-0 hover:bg-accent/50 transition-all duration-200"
+      className="h-10 w-10 p-0 hover:bg-accent/50 hover:text-accent-foreground transition-all duration-200"
       aria-label={`Switch to ${actualTheme === 'dark' ? 'light' : 'dark'} mode`}
     >
       <div className="relative h-5 w-5">

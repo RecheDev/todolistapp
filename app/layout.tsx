@@ -5,8 +5,8 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { ThemeScript } from "@/components/ui/ThemeScript";
 
 export const metadata: Metadata = {
-  title: "ToDoAPP By RecheDev | Portfolio Demo",
-  description: "Demo portfolio application built with Next.js 15 and TypeScript. Interactive demo with localStorage.",
+  title: "SenseiNotes - Master Your Productivity",
+  description: "Master your tasks and notes with SenseiNotes. Intelligent task management with calendar integration, analytics, and workflow optimization.",
 };
 
 export const viewport: Viewport = {

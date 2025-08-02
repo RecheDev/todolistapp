@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-// Dark mode only - no theme toggle needed
+import { SenseiLogoWithText } from '@/components/ui/logo'
 import Link from 'next/link'
 
 export default function Home() {
@@ -33,10 +33,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-sm mx-auto relative">
-        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
-          <h1 className="text-sm font-medium text-muted-foreground text-center">
-            ToDoAPP by RecheDev
-          </h1>
+        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
+          <SenseiLogoWithText size="md" className="justify-center" />
         </div>
           <Card className="shadow-lg border bg-card">
             <CardHeader className="text-center space-y-4 p-6">
