@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Todo, User } from '@/types/database'
 
 // Mock user for testing
-const mockUser: User = {
+export const mockUser: User = {
   id: 'test-user-id',
   email: 'test@example.com',
   name: 'Test User',

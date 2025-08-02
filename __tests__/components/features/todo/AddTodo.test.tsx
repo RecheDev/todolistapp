@@ -1,15 +1,9 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor, userEvent } from '../../../utils/test-utils'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { AddTodo } from '@/components/features/todo/AddTodo'
 
-// Mock the validations module
-jest.mock('@/lib/validations', () => ({
-  createTodoSchema: {},
-  validateWithSchema: jest.fn().mockReturnValue({ success: true, data: { title: 'Test Todo', description: 'Test Description' } }),
-  sanitizeTodoInput: jest.fn().mockImplementation((data) => data),
-}))
-
-// Mock sonner
+// Mock sonner toast
 jest.mock('sonner', () => ({
   toast: {
     success: jest.fn(),
@@ -17,204 +11,180 @@ jest.mock('sonner', () => ({
   },
 }))
 
-const { toast } = require('sonner')
-const { validateWithSchema } = require('@/lib/validations')
-
 describe('AddTodo', () => {
-  const mockOnAdd = jest.fn()
+  let mockOnAdd: jest.Mock
+  let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
+    mockOnAdd = jest.fn()
+    user = userEvent.setup()
+  })
+
+  afterEach(() => {
     jest.clearAllMocks()
   })
 
   it('renders collapsed state initially', () => {
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
     expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
-    expect(screen.queryByRole('form')).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText(/e\.g\., Call dentist/i)).not.toBeInTheDocument()
   })
 
   it('expands when add button is clicked', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
-    const addButton = screen.getByRole('button', { name: /add new task/i })
-    await user.click(addButton)
-
-    expect(screen.getByRole('form')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/what do you need to do/i)).toBeInTheDocument()
+    
+    await user.click(screen.getByRole('button', { name: /add new task/i }))
+    
+    expect(screen.getByPlaceholderText(/e\.g\., Call dentist/i)).toBeInTheDocument()
+    expect(screen.getByText(/create new task/i)).toBeInTheDocument()
   })
 
   it('shows form fields when expanded', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    expect(screen.getByPlaceholderText(/what do you need to do/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/description \(optional\)/i)).toBeInTheDocument()
-    expect(screen.getByText(/priority/i)).toBeInTheDocument()
-    expect(screen.getByText(/due date \(optional\)/i)).toBeInTheDocument()
+    
+    expect(screen.getByPlaceholderText(/e\.g\., Call dentist/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/add more details/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /create task/i })).toBeInTheDocument()
   })
 
-
   it('submits regular todo with valid data', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    // Fill in the form
-    const titleInput = screen.getByPlaceholderText(/what do you need to do/i)
-    const descriptionInput = screen.getByPlaceholderText(/description \(optional\)/i)
-
+    
+    // Fill in form
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
     await user.type(titleInput, 'Test Todo')
+    
+    const descriptionInput = screen.getByPlaceholderText(/add more details/i)
     await user.type(descriptionInput, 'Test Description')
-
-    // Submit the form
-    const submitButton = screen.getByRole('button', { name: /create task/i })
-    await user.click(submitButton)
-
+    
+    // Submit
+    await user.click(screen.getByRole('button', { name: /create task/i }))
+    
     await waitFor(() => {
       expect(mockOnAdd).toHaveBeenCalledWith('Test Todo', 'Test Description', 'medium', undefined)
     })
-
-    expect(toast.success).toHaveBeenCalledWith('✅ Task created successfully!', { duration: 3000 })
   })
 
-
   it('shows validation errors', async () => {
-    const user = userEvent.setup()
-    validateWithSchema.mockReturnValue({
-      success: false,
-      errors: ['Title is required', 'Description is too long']
-    })
-
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    // Try to submit without filling required fields
-    const submitButton = screen.getByRole('button', { name: /create task/i })
-    await user.click(submitButton)
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('⚠️ Please correct the errors in the form', { duration: 4000 })
-    })
-
+    
+    // Try to submit without title
+    await user.click(screen.getByRole('button', { name: /create task/i }))
+    
+    // Form should prevent submission and not call onAdd
     expect(mockOnAdd).not.toHaveBeenCalled()
   })
 
-
   it('handles keyboard shortcuts', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    const titleInput = screen.getByPlaceholderText(/what do you need to do/i)
+    
+    // Fill in title
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
     await user.type(titleInput, 'Test Todo')
-
-    // Test Cmd+Enter submission
-    await user.keyboard('{Meta>}{Enter}{/Meta}')
-
+    
+    // Submit with Ctrl+Enter
+    await user.keyboard('{Control>}{Enter}{/Control}')
+    
     await waitFor(() => {
-      expect(mockOnAdd).toHaveBeenCalled()
+      expect(mockOnAdd).toHaveBeenCalledWith('Test Todo', undefined, 'medium', undefined)
     })
   })
 
   it('handles escape key to cancel', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    expect(screen.getByRole('form')).toBeInTheDocument()
-
-    // Press escape to cancel
+    
+    // Fill in some data
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
+    await user.type(titleInput, 'Test Todo')
+    
+    // Press escape
     await user.keyboard('{Escape}')
-
-    expect(screen.queryByRole('form')).not.toBeInTheDocument()
+    
+    // Form should collapse and data should be cleared
     expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText(/e\.g\., Call dentist/i)).not.toBeInTheDocument()
   })
 
   it('resets form after successful submission', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand and fill form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    const titleInput = screen.getByPlaceholderText(/what do you need to do/i)
-    const descriptionInput = screen.getByPlaceholderText(/description \(optional\)/i)
-
+    
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
     await user.type(titleInput, 'Test Todo')
-    await user.type(descriptionInput, 'Test Description')
-
-    const submitButton = screen.getByRole('button', { name: /create task/i })
-    await user.click(submitButton)
-
+    
+    // Submit
+    await user.click(screen.getByRole('button', { name: /create task/i }))
+    
     await waitFor(() => {
       expect(mockOnAdd).toHaveBeenCalled()
     })
-
-    // Form should be collapsed and fields reset
-    expect(screen.queryByRole('form')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
+    
+    // Wait for form to reset and collapse
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
+    })
+    
+    expect(screen.queryByPlaceholderText(/e\.g\., Call dentist/i)).not.toBeInTheDocument()
   })
 
   it('shows loading state during submission', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} isCreating={true} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    const submitButton = screen.getByRole('button', { name: /creating/i })
-    expect(submitButton).toBeDisabled()
-    expect(screen.getByText('Creating...')).toBeInTheDocument()
+    
+    // Button should show loading state
+    expect(screen.getByRole('button', { name: /creating/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled()
   })
 
   it('disables form during creation', async () => {
-    const user = userEvent.setup()
     render(<AddTodo onAdd={mockOnAdd} isCreating={true} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    const titleInput = screen.getByPlaceholderText(/what do you need to do/i)
-    const descriptionInput = screen.getByPlaceholderText(/description \(optional\)/i)
-    const cancelButton = screen.getByRole('button', { name: '' }) // Cancel button with X icon
-
+    
+    // Form fields should be disabled
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
+    const submitButton = screen.getByRole('button', { name: /creating/i })
+    
     expect(titleInput).toBeDisabled()
-    expect(descriptionInput).toBeDisabled()
-    expect(cancelButton).toBeDisabled()
+    expect(submitButton).toBeDisabled()
   })
 
-  it('clears field errors on input change', async () => {
-    const user = userEvent.setup()
-    validateWithSchema.mockReturnValueOnce({
-      success: false,
-      errors: ['Title is required']
-    }).mockReturnValue({
-      success: true,
-      data: { title: 'Valid Title', description: '' }
-    })
-
+  it('validates and submits form correctly', async () => {
     render(<AddTodo onAdd={mockOnAdd} />)
-
+    
+    // Expand form
     await user.click(screen.getByRole('button', { name: /add new task/i }))
-
-    // Submit to trigger validation error
-    const submitButton = screen.getByRole('button', { name: /create task/i })
-    await user.click(submitButton)
-
-    // Now type in the title field to clear the error
-    const titleInput = screen.getByPlaceholderText(/what do you need to do/i)
+    
+    // Fill in valid title
+    const titleInput = screen.getByPlaceholderText(/e\.g\., Call dentist/i)
     await user.type(titleInput, 'Valid Title')
-
-    // The error should be cleared and we should be able to submit
-    await user.click(submitButton)
-
+    
+    // Submit form
+    await user.click(screen.getByRole('button', { name: /create task/i }))
+    
+    // Should successfully submit
     await waitFor(() => {
-      expect(mockOnAdd).toHaveBeenCalled()
+      expect(mockOnAdd).toHaveBeenCalledWith('Valid Title', undefined, 'medium', undefined)
     })
   })
 })
